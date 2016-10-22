@@ -1,4 +1,9 @@
 import abc
+import sys
+from select import select
+
+
+
 from TextData import TextData
 
 class AbstractInputDevice(object):
@@ -25,6 +30,21 @@ class StdinInputDevice(AbstractInputDevice):
     def __init__(self):
         super(StdinInputDevice, self).__init__()
 
+    def stdin_with_timeout(self, timeout):
+        print "---> ",
+        sys.stdout.flush()
+
+        rlist, _, _ = select([sys.stdin], [], [], timeout)
+        if rlist:
+            data = sys.stdin.readline()
+            return data
+        else:
+            print ""
+            return None
+
     def take_input(self):
-        data = raw_input('---> ')
-        return [TextData(data)]
+        data = self.stdin_with_timeout(10)
+        if data:
+            return [TextData(data)]
+        else:
+            return []

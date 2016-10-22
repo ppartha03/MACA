@@ -1,4 +1,4 @@
-from AbstractAgent import AbstractAgent
+from agents.AbstractAgent import AbstractAgent
 
 class EchoAgent(AbstractAgent):
     """

@@ -22,4 +22,4 @@ class StdoutOutputDevice(AbstractOutputDevice):
         super(StdoutOutputDevice, self).__init__()
 
     def write_output(self, output):
-        print 'Response: {0}'.format(output.data if output else output)
+        print 'AI: {0}'.format(output.data if output else output)

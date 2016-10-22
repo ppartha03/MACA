@@ -1,11 +1,15 @@
+import logging
 import time
 import signal
 import threading
+import traceback
 
-import InputDevice
-import OutputDevice
-from EchoAgent import EchoAgent
-from FlightBookingAgent import FlightBookingAgent
+import Queue
+
+from devices import InputDevice
+from devices import OutputDevice
+from agents.sample_agents.EchoAgent import EchoAgent
+from agents.hred.gods_agent import hred_agent
 
 class MainObject(object):
     """
@@ -26,22 +30,40 @@ def input_loop(main_object):
 
 def output_loop(main_object):
     while not main_object.terminate:
-        next_output = main_object.agent.next_output(timeout = None)
-        main_object.output_device.write_output(next_output)
+        try:
+            next_output = main_object.agent.next_output(timeout = 10)
+            if next_output:
+                main_object.output_device.write_output(next_output)
+        except: # Notify exception
+            traceback.print_exc()
 
 
 if __name__ == "__main__":
-    agent = FlightBookingAgent()
-    main_object = MainObject(InputDevice.StdinInputDevice(), OutputDevice.StdoutOutputDevice(), agent)
+    logging.basicConfig(format='[%(asctime)s][%(levelname)s][%(filename)s][%(lineno)d] - %(message)s',
+                    datefmt='%d/%m/%Y %H:%M:%S',
+                    filename='log.gods',
+                    filemode='a',
+                    level=logging.DEBUG)
+    logger = logging.getLogger(__name__)
+
+    input_device = InputDevice.StdinInputDevice()
+    output_device = OutputDevice.StdoutOutputDevice()
+    agent = hred_agent.HREDAgent()
+
+    main_object = MainObject(input_device, output_device, agent)
 
     inputs = threading.Thread(target = input_loop, args = (main_object, ))
+    inputs.daemon = True
     outputs = threading.Thread(target = output_loop, args = (main_object, ))
+    outputs.daemon = True
 
     def terminate():
         main_object.terminate = True
 
         inputs.join()
+        print "Terminated input loop..."
         outputs.join()
+        print "Terminated output loop..."
 
     signal.signal(signal.SIGTERM, terminate)
 
@@ -54,3 +76,4 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print "Terminating gods..."
         terminate()
+        print "Terminating main thread..."

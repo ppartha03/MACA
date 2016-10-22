@@ -39,9 +39,12 @@ class AbstractAgent(object):
 
             Returns
             -------
-            The next available output from the agent.
+            The next available output from the agent, or None if timeout.
         """
-        return self.output_data.get(True, timeout = timeout)
+        try:
+            return self.output_data.get(True, timeout = timeout)
+        except Queue.Empty:
+            return None
 
     def queue_output(self, data):
         """
