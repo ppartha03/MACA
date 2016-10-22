@@ -3,7 +3,7 @@ import sys
 from select import select
 
 
-
+from config import config
 from TextData import TextData
 
 class AbstractInputDevice(object):
@@ -43,7 +43,7 @@ class StdinInputDevice(AbstractInputDevice):
             return None
 
     def take_input(self):
-        data = self.stdin_with_timeout(10)
+        data = self.stdin_with_timeout(config['io_timeout'])
         if data:
             return [TextData(data)]
         else:

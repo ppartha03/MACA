@@ -20,7 +20,6 @@ def sample_wrapper(sample_logic):
     def sample_apply(*args, **kwargs):
         sampler = args[0]
         contexts = args[1]
-	print type(contexts), contexts
 
         verbose = kwargs.get('verbose', False)
 
@@ -64,7 +63,7 @@ def sample_wrapper(sample_logic):
 
             if verbose:
                 for i in range(len(converted_samples)):
-                    print "{}: {}".format(costs[i], converted_samples[i].encode('utf-8'))
+                    logger.debug("{}: {}".format(costs[i], converted_samples[i].encode('utf-8')))
 
             context_samples.append(converted_samples)
             context_costs.append(costs)

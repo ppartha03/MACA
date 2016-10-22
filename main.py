@@ -11,6 +11,8 @@ from devices import OutputDevice
 from agents.sample_agents.EchoAgent import EchoAgent
 from agents.hred.gods_agent import hred_agent
 
+from config import config
+
 class MainObject(object):
     """
         Main object holding the InputTexts.
@@ -31,7 +33,7 @@ def input_loop(main_object):
 def output_loop(main_object):
     while not main_object.terminate:
         try:
-            next_output = main_object.agent.next_output(timeout = 10)
+            next_output = main_object.agent.next_output(timeout = config['io_timeout'])
             if next_output:
                 main_object.output_device.write_output(next_output)
         except: # Notify exception
@@ -47,7 +49,7 @@ if __name__ == "__main__":
     logger = logging.getLogger(__name__)
 
     input_device = InputDevice.StdinInputDevice()
-    output_device = OutputDevice.StdoutOutputDevice()
+    output_device = OutputDevice.FileOutputDevice('out.gods')
     agent = hred_agent.HREDAgent()
 
     main_object = MainObject(input_device, output_device, agent)
