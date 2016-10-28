@@ -12,17 +12,31 @@ from utils import file_utils
 from config import config
 
 def input_loop(system_object):
+    def preprocess_data(data):
+        for preprocessor in system_object.preprocessors:
+            data = preprocessor.preprocess(data)
+
+        return data
+
     while not system_object.terminate:
         raw_inputs = system_object.input_device.take_input()
-        processed_inputs = [system_object.preprocessor.preprocess(data) for data in raw_inputs]
+
+        processed_inputs = [preprocess_data(data) for data in raw_inputs]
         system_object.agent.process_inputs(processed_inputs)
 
 def output_loop(system_object):
+    def postprocess_data(data):
+        for postprocessor in system_object.postprocessors:
+            data = postprocessor.postprocess(data)
+
+        return data
+
     while not system_object.terminate:
         try:
             next_output = system_object.agent.next_output(timeout = config['io_timeout'])
             if next_output:
-                system_object.output_device.write_output(system_object.postprocessor.postprocess(next_output))
+                to_write = postprocess_data(next_output)
+                system_object.output_device.write_output(to_write)
         except: # Notify exception
             traceback.print_exc()
 
@@ -45,9 +59,9 @@ if __name__ == "__main__":
         system_object.terminate = True
 
         inputs.join()
-        print "Terminated input loop..."
+        print("Terminated input loop...")
         outputs.join()
-        print "Terminated output loop..."
+        print("Terminated output loop...")
 
     signal.signal(signal.SIGTERM, terminate)
 
@@ -58,6 +72,6 @@ if __name__ == "__main__":
         while True:
             time.sleep(0.1)
     except KeyboardInterrupt:
-        print "Terminating gods..."
+        print("Terminating gods...")
         terminate()
-        print "Terminating main thread..."
+        print("Terminating main thread...")

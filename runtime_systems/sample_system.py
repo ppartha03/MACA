@@ -1,9 +1,11 @@
 from devices import InputDevice
 from devices import OutputDevice
-from agents.sample_agents.EchoAgent import EchoAgent
+from agents.sample_agents import EchoAgent
 
 from preprocessing import VoidPreprocessor
 from postprocessing import VoidPostprocessor
+
+from domain_knowledge import EmptyDomainKnowledge
 
 system_description = {
     'input' : {
@@ -13,13 +15,26 @@ system_description = {
         'class' : OutputDevice.FileOutputDevice,
         'args' : ['out.gods']
     },
-    'preprocessing' : {
-        'class' : VoidPreprocessor.VoidPreprocessor,
-    },
-    'postprocessing' : {
-        'class' : VoidPostprocessor.VoidPostprocessor,
-    },
+    'preprocessing' : [
+        {
+            'class' : VoidPreprocessor.VoidPreprocessor,
+        },
+        {
+            'class' : VoidPreprocessor.VoidPreprocessor,
+        }
+    ],
+    'postprocessing' : [
+        {
+            'class' : VoidPostprocessor.VoidPostprocessor,
+        },
+        {
+            'class' : VoidPostprocessor.VoidPostprocessor,
+        }
+    ],
     'agent' : {
-        'class' : EchoAgent
+        'class' : EchoAgent.EchoAgent
+    },
+    'domain_knowledge' : {
+        'class' : EmptyDomainKnowledge.EmptyDomainKnowledge
     }
 }

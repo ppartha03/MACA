@@ -9,22 +9,32 @@ class System(object):
         input_device = object_creator(system_description['input'])
         output_device =  object_creator(system_description['output'])
 
-        preprocessor = object_creator(system_description['preprocessing'])
-        postprocessor = object_creator(system_description['postprocessing'])
+        preprocessors = [object_creator(preprocessor_description) for preprocessor_description in system_description['preprocessing']]
+        postprocessors = [object_creator(postprocessor_description) for postprocessor_description in system_description['postprocessing']]
         agent = object_creator(system_description['agent'])
 
-        return System(input_device, output_device, preprocessor, postprocessor, agent)
+        domain_knowledge = object_creator(system_description['domain_knowledge'])
+        for preprocessor in preprocessors:
+            preprocessor.domain_knowledge = domain_knowledge
+
+        for postprocessor in postprocessors:
+            postprocessor.domain_knowledge = domain_knowledge
+
+        agent.domain_knowledge = domain_knowledge
+
+        return System(input_device, output_device, preprocessors, postprocessors, agent, domain_knowledge)
 
     """
         System object holding all components of the system.
     """
-    def __init__(self, input_device, output_device, preprocessor, postprocessor, agent):
+    def __init__(self, input_device, output_device, preprocessors, postprocessors, agent, domain_knowledge):
         super(System, self).__init__()
         self.terminate = False
 
         self.input_device = input_device
         self.output_device = output_device
-        self.preprocessor = preprocessor
-        self.postprocessor = postprocessor
+        self.preprocessors = preprocessors
+        self.postprocessors = postprocessors
 
         self.agent = agent
+        self.domain_knowledge = domain_knowledge

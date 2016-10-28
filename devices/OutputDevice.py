@@ -1,5 +1,5 @@
 import abc
-
+import datetime
 
 class AbstractOutputDevice(object):
     """
@@ -37,5 +37,6 @@ class FileOutputDevice(AbstractOutputDevice):
         self.file_object = open(file_name, write_mode)
 
     def write_output(self, output):
-        self.file_object.write('AI: {0}\n'.format(output.data if output else output))
+        prefix = datetime.datetime.now().strftime('[%d/%m/%Y][%H:%M:%S]')
+        self.file_object.write('{0} - AI: {1}'.format(prefix, output.data if output else output))
         self.file_object.flush()
