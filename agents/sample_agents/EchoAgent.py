@@ -8,5 +8,10 @@ class EchoAgent(AbstractAgent):
         super(EchoAgent, self).__init__()
 
     def process_inputs(self, inputs):
+    	"""
+    		Expecting a list of inputs. Each input is a list of preprocessed data.
+    		This agent picks the first preprocessed data in the input.
+    	"""
+
         for data in inputs:
-            self.queue_output(data)
+            self.queue_output(data[0])

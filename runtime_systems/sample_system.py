@@ -6,6 +6,7 @@ from preprocessing import VoidPreprocessor
 from postprocessing import VoidPostprocessor
 
 from domain_knowledge import EmptyDomainKnowledge
+from conversation_listeners import LoggingListener
 
 system_description = {
     'input' : {
@@ -15,7 +16,7 @@ system_description = {
         'class' : OutputDevice.FileOutputDevice,
         'args' : ['out.gods']
     },
-    'preprocessing' : [
+    'preprocessing' : [ # Happens in parallel
         {
             'class' : VoidPreprocessor.VoidPreprocessor,
         },
@@ -23,18 +24,26 @@ system_description = {
             'class' : VoidPreprocessor.VoidPreprocessor,
         }
     ],
-    'postprocessing' : [
-        {
-            'class' : VoidPostprocessor.VoidPostprocessor,
-        },
-        {
-            'class' : VoidPostprocessor.VoidPostprocessor,
-        }
-    ],
+    'postprocessing' : {
+        'output_index' : 0, # Index of the postprocessing unit whose output will be piped to output
+        'modules' : [ # Happens in parallel
+            {
+                'class' : VoidPostprocessor.VoidPostprocessor,
+            },
+            {
+                'class' : VoidPostprocessor.VoidPostprocessor,
+            }
+        ]
+    },
     'agent' : {
         'class' : EchoAgent.EchoAgent
     },
     'domain_knowledge' : {
         'class' : EmptyDomainKnowledge.EmptyDomainKnowledge
-    }
+    },
+    'listeners' : [
+        {
+            'class' : LoggingListener.LoggingListener
+        }
+    ]
 }

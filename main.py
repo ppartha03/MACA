@@ -12,30 +12,23 @@ from utils import file_utils
 from config import config
 
 def input_loop(system_object):
-    def preprocess_data(data):
-        for preprocessor in system_object.preprocessors:
-            data = preprocessor.preprocess(data)
-
-        return data
-
     while not system_object.terminate:
         raw_inputs = system_object.input_device.take_input()
+        system_object.listeners.listen_to_inputs(raw_inputs)
 
-        processed_inputs = [preprocess_data(data) for data in raw_inputs]
+        processed_inputs = [system_object.preprocessing.preprocess(data) for data in raw_inputs]
         system_object.agent.process_inputs(processed_inputs)
 
 def output_loop(system_object):
-    def postprocess_data(data):
-        for postprocessor in system_object.postprocessors:
-            data = postprocessor.postprocess(data)
-
-        return data
-
     while not system_object.terminate:
         try:
             next_output = system_object.agent.next_output(timeout = config['io_timeout'])
             if next_output:
-                to_write = postprocess_data(next_output)
+                processed_outputs = system_object.postprocessing.postprocess(next_output)
+                system_object.listeners.listen_to_output(processed_outputs)
+
+                to_write = system_object.postprocessing.get_output(processed_outputs)
+
                 system_object.output_device.write_output(to_write)
         except: # Notify exception
             traceback.print_exc()
