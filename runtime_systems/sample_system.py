@@ -1,5 +1,7 @@
 from devices import InputDevice
 from devices import OutputDevice
+
+# from agents.hred.gods_agent import hred_agent  # hred_agent.HREDAgent
 from agents.sample_agents import EchoAgent
 
 from preprocessing import VoidPreprocessor
@@ -41,9 +43,12 @@ system_description = {
     'domain_knowledge' : {
         'class' : EmptyDomainKnowledge.EmptyDomainKnowledge
     },
-    'listeners' : [
-        {
-            'class' : LoggingListener.LoggingListener
-        }
-    ]
+    'listeners' : {
+        'named' : {},
+        'unnamed': [
+            {
+                'class' : LoggingListener.LoggingListener
+            }
+        ]
+    }
 }

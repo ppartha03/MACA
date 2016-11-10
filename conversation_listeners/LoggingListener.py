@@ -10,14 +10,5 @@ class LoggingListener(AbstractConversationListener):
     def __init__(self):
         super(LoggingListener, self).__init__()
 
-    def listen_to_input(self, inputs):
-        """
-            Preprocessed input channels.
-        """
-        logger.info("Input listened: {0}".format(inputs))
-
-    def listen_to_output(self, outputs):
-        """
-            Postprocessed output channels.
-        """
-        logger.info("Output listened: {0}".format(outputs))
+    def process_notification(self, content, tag):
+        logger.info("Content listened [{0}]: {1}".format(tag, content))

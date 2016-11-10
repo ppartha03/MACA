@@ -1,5 +1,6 @@
 import traceback
 
+from utils.abstract_designs import PubSub
 from utils import object_utils
 object_creator = object_utils.create_object
 
@@ -8,7 +9,7 @@ from PostprocessingUnit import PostprocessingUnit
 from ListenerUnit import ListenerUnit
 
 
-class System(object):
+class System(PubSub.Publisher):
 
     @classmethod
     def construct_system(klass, system_description):
@@ -27,7 +28,10 @@ class System(object):
         postprocessing.set_domain_knowledge(domain_knowledge)
         agent.domain_knowledge = domain_knowledge
 
-        return System(input_device, output_device, preprocessing, postprocessing, listeners, agent, domain_knowledge)
+        output_system = System(input_device, output_device, preprocessing, postprocessing, listeners, agent, domain_knowledge)
+        listeners.subscribe(output_system)
+
+        return output_system
 
     """
         System object holding all components of the system.
@@ -56,7 +60,7 @@ class System(object):
     def input_loop(self):
         while not self.terminate:
             raw_inputs = self.input_device.take_input()
-            self.listeners.listen_to_inputs(raw_inputs)
+            self.publish(raw_inputs, tag = 'input')
 
             processed_inputs = [self.preprocessing.preprocess(data) for data in raw_inputs]
             self.agent.process_inputs(processed_inputs)
@@ -67,7 +71,7 @@ class System(object):
                 next_output = self.agent.next_output(timeout = self.runtime_config['io_timeout'])
                 if next_output:
                     processed_outputs = self.postprocessing.postprocess(next_output)
-                    self.listeners.listen_to_output(processed_outputs)
+                    self.publish(processed_outputs, tag = 'output')
 
                     to_write = self.postprocessing.get_output(processed_outputs)
 
