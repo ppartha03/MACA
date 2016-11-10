@@ -68,7 +68,7 @@ class HREDAgent(AbstractAgent):
 
     def process_inputs(self, inputs):
         for data in inputs:
-            var = data.data
+            var = data[0].data
 
             # Increase number of utterances. We just set it to zero for simplicity so that model has no memory.
             # But it works fine if we increase this number
