@@ -35,6 +35,8 @@ logger = logging.getLogger(__name__)
 class HREDAgent(AbstractAgent):
     """
         Agent using HRED.
+        Need to enable certain Theano flags when using.
+        THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32
     """
     def __init__(self):
         super(HREDAgent, self).__init__()
