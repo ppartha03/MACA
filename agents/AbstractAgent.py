@@ -1,7 +1,9 @@
 import abc
 import Queue
 
-class AbstractAgent(object):
+from utils.abstract_designs import PubSub
+
+class AbstractAgent(PubSub.Subscriber):
     """
         AbstractAgent: represent an abstract agent with internal information state.
     """
@@ -51,3 +53,9 @@ class AbstractAgent(object):
             Enqueue this data as an available output.
         """
         self.output_data.put(data)
+
+    def process_notification(self, content, tag):
+        """
+            Override this to process any feedback information.
+        """
+        pass
