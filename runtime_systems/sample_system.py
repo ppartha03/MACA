@@ -4,7 +4,7 @@ from devices import OutputDevice
 # from agents.hred.gods_agent import hred_agent  # hred_agent.HREDAgent
 from agents.sample_agents import EchoAgent
 
-from preprocessing import VoidPreprocessor
+from preprocessing import VoidPreprocessor, TokenizerPreprocessor
 from postprocessing import VoidPostprocessor
 
 from domain_knowledge import EmptyDomainKnowledge
@@ -20,7 +20,7 @@ system_description = {
     },
     'preprocessing' : [ # Happens in parallel
         {
-            'class' : VoidPreprocessor.VoidPreprocessor,
+            'class' : TokenizerPreprocessor.TokenizerPreprocessor,
         },
         {
             'class' : VoidPreprocessor.VoidPreprocessor,

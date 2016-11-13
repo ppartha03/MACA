@@ -1,4 +1,5 @@
-
+import nltk
+nltk.data.path.append("/NOBACKUP/nltk_data")
 
 config = {
 	'io_timeout' : 10,
