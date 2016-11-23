@@ -10,5 +10,5 @@ class LoggingListener(AbstractConversationListener):
     def __init__(self):
         super(LoggingListener, self).__init__()
 
-    def process_notification(self, content, tag):
-        logger.info("Content listened [{0}]: {1}".format(tag, content))
+    def process_notification(self, content, channel):
+        logger.info("Content listened [{0}]: {1}".format(channel, content))

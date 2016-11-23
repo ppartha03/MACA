@@ -4,6 +4,7 @@ from utils.abstract_designs import PubSub
 from utils import object_utils
 object_creator = object_utils.create_object
 
+import system_channels
 from PreprocessingUnit import PreprocessingUnit
 from PostprocessingUnit import PostprocessingUnit
 from ListenerUnit import ListenerUnit
@@ -21,19 +22,16 @@ class System(PubSub.Publisher):
         listeners = ListenerUnit.construct_listener_unit(system_description['listeners'])
 
         agent = object_creator(system_description['agent'])
-        if listeners.get_named_listener('feedback_mechanism'): # Subscribe to feedback
-            listeners.get_named_listener('feedback_mechanism').accept_subscription(agent)
-
         domain_knowledge = object_creator(system_description['domain_knowledge'])
 
         preprocessing.set_domain_knowledge(domain_knowledge)
         postprocessing.set_domain_knowledge(domain_knowledge)
         agent.domain_knowledge = domain_knowledge
 
-
         output_system = System(input_device, output_device, preprocessing, postprocessing, listeners, agent, domain_knowledge)
-        listeners.subscribe(output_system)
+        listeners.subscribe(output_system, (system_channels.INPUT, system_channels.OUTPUT))
 
+        output_system.accept_subscription(agent, channels = (system_channels.FEEDBACK,))
         return output_system
 
     """
@@ -63,7 +61,10 @@ class System(PubSub.Publisher):
     def input_loop(self):
         while not self.terminate:
             raw_inputs = self.input_device.take_input()
-            self.publish(raw_inputs, tag = 'input')
+            if not raw_inputs:
+                continue
+
+            self.publish(raw_inputs, channel = system_channels.INPUT)
 
             processed_inputs = [self.preprocessing.preprocess(data) for data in raw_inputs]
             self.agent.process_inputs(processed_inputs)
@@ -74,7 +75,7 @@ class System(PubSub.Publisher):
                 next_output = self.agent.next_output(timeout = self.runtime_config['io_timeout'])
                 if next_output:
                     processed_outputs = self.postprocessing.postprocess(next_output)
-                    self.publish(processed_outputs, tag = 'output')
+                    self.publish(processed_outputs, channel = system_channels.OUTPUT)
 
                     to_write = self.postprocessing.get_output(processed_outputs)
 

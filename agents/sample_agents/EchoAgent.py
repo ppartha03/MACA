@@ -1,5 +1,8 @@
 from agents.AbstractAgent import AbstractAgent
 
+import logging
+logger = logging.getLogger(__name__)
+
 class EchoAgent(AbstractAgent):
     """
         Simply echo the input to the output.
@@ -15,3 +18,6 @@ class EchoAgent(AbstractAgent):
 
         for data in inputs:
             self.queue_output(data[0])
+
+    def process_notification(self, content, channel):
+        logger.info("Agent received notification {0} on channel {1}.".format(content, channel))

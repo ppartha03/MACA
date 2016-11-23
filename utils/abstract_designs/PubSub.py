@@ -2,33 +2,41 @@ import abc
 
 class Publisher(object):
 
-    __metaclass__ = abc.ABCMeta
-
     def __init__(self):
         super(Publisher, self).__init__()
-        self.subscription_list = []
+        self.subscription_list = {}
 
-    def accept_subscription(self, subscriber):
-        self.subscription_list.append(subscriber)
+    def _add_subscriber(self, subscriber, channel):
+        if channel not in self.subscription_list:
+            self.subscription_list[channel] = set()
 
+        self.subscription_list[channel].add(subscriber)
 
-    def publish(self, content, tag = None):
-        for subscriber in self.subscription_list:
-            subscriber.notify(content, tag)
+    def accept_subscription(self, subscriber, channels = ()):
+        """
+            Add the subscriber to the appropriate listening channels.
+        """
+        for channel in channels:
+            self._add_subscriber(subscriber, channel)
+
+    def publish(self, content, channel = None):
+        """
+            Publish a content to a channel.
+        """
+        for subscriber in self.subscription_list.get(channel, []):
+            subscriber.notify(content, channel)
 
 
 class Subscriber(object):
 
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, interested_tags = None):
+    def __init__(self):
         super(Subscriber, self).__init__()
-        self.interested_tags = interested_tags # If none then listen to everything
 
-    def notify(self, content, tag):
-        if self.interested_tags is None or tag in self.interested_tags:
-            self.process_notification(content, tag)
+    def notify(self, content, channel):
+        self.process_notification(content, channel)
 
     @abc.abstractmethod
-    def process_notification(self, content, tag):
+    def process_notification(self, content, channel):
         pass

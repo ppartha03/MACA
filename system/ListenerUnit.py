@@ -2,10 +2,11 @@ from utils import object_utils
 from utils import sanity_utils
 
 import DomainKnowledgeUser
+from conversation_listeners import Feedback
 
 class ListenerUnit(DomainKnowledgeUser.DomainKnowledgeUser):
 
-    KNOWN_NAMES = set(('feedback_mechanism', 'database'))
+    KNOWN_NAMES = set(('feedback', 'database'))
 
     @classmethod
     def construct_listener_unit(klass, description):
@@ -24,9 +25,15 @@ class ListenerUnit(DomainKnowledgeUser.DomainKnowledgeUser):
     def get_named_listener(self, name):
         return self.named_modules.get(name)
 
-    def subscribe(self, system):
+    def subscribe(self, system, channels):
         for module in self.unnamed_modules:
-            system.accept_subscription(module)
+            system.accept_subscription(module, channels)
 
         for module in self.named_modules.values():
-            system.accept_subscription(module)
+            system.accept_subscription(module, channels)
+
+        # Special listeners that publishes to the system
+        if 'feedback' in self.named_modules:
+            module = self.named_modules['feedback']
+            assert isinstance(module, Feedback.Feedback)
+            module.feedback_publisher = system

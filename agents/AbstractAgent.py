@@ -54,7 +54,7 @@ class AbstractAgent(PubSub.Subscriber):
         """
         self.output_data.put(data)
 
-    def process_notification(self, content, tag):
+    def process_notification(self, content, channel):
         """
             Override this to process any feedback information.
         """

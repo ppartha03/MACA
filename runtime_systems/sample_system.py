@@ -4,11 +4,12 @@ from devices import OutputDevice
 # from agents.hred.gods_agent import hred_agent  # hred_agent.HREDAgent
 from agents.sample_agents import EchoAgent
 
-from preprocessing import VoidPreprocessor, TokenizerPreprocessor
+from preprocessing import VoidPreprocessor
 from postprocessing import VoidPostprocessor
 
 from domain_knowledge import EmptyDomainKnowledge
 from conversation_listeners import LoggingListener
+from conversation_listeners import Feedback
 
 system_description = {
     'input' : {
@@ -20,7 +21,7 @@ system_description = {
     },
     'preprocessing' : [ # Happens in parallel
         {
-            'class' : TokenizerPreprocessor.TokenizerPreprocessor,
+            'class' : VoidPreprocessor.VoidPreprocessor,
         },
         {
             'class' : VoidPreprocessor.VoidPreprocessor,
@@ -44,7 +45,9 @@ system_description = {
         'class' : EmptyDomainKnowledge.EmptyDomainKnowledge
     },
     'listeners' : {
-        'named' : {},
+        'named' : {
+            'feedback' : { 'class' : Feedback.SampleFeedback }
+        },
         'unnamed': [
             {
                 'class' : LoggingListener.LoggingListener
