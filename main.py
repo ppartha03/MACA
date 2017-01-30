@@ -22,21 +22,25 @@ if __name__ == "__main__":
     system_object = system.System.construct_system(system_description)
     system_object.configure(config)
 
-    inputs = threading.Thread(target = system_object.input_loop)
-    outputs = threading.Thread(target = system_object.output_loop)
+    # inputs = threading.Thread(target = system_object.input_loop)
+    # outputs = threading.Thread(target = system_object.output_loop)
+    main_loop = threading.Thread(target = system_object.run)
 
     def terminate():
         system_object.terminate = True
 
-        inputs.join()
-        print("Terminated input loop...")
-        outputs.join()
-        print("Terminated output loop...")
+        # inputs.join()
+        # print("Terminated input loop...")
+        # outputs.join()
+        # print("Terminated output loop...")
+        main_loop.join()
+        print("Terminated main loop...")
 
     signal.signal(signal.SIGTERM, terminate)
 
-    inputs.start()
-    outputs.start()
+    # inputs.start()
+    # outputs.start()
+    main_loop.start()
 
     try:
         while True:

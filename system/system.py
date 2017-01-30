@@ -82,3 +82,29 @@ class System(PubSub.Publisher):
                     self.output_device.write_output(to_write)
             except: # Notify exception
                 traceback.print_exc()
+
+    def run(self):
+        """
+            Single loop implementation
+        """
+        while not self.terminate:
+            raw_inputs = self.input_device.take_input()
+            if not raw_inputs:
+                continue
+
+            self.publish(raw_inputs, channel = system_channels.INPUT)
+
+            processed_inputs = [self.preprocessing.preprocess(data) for data in raw_inputs]
+            self.agent.process_inputs(processed_inputs)
+
+            try:
+                next_output = self.agent.next_output(timeout = self.runtime_config['io_timeout'])
+                if next_output:
+                    processed_outputs = self.postprocessing.postprocess(next_output)
+                    self.publish(processed_outputs, channel = system_channels.OUTPUT)
+
+                    to_write = self.postprocessing.get_output(processed_outputs)
+
+                    self.output_device.write_output(to_write)
+            except: # Notify exception
+                traceback.print_exc()
