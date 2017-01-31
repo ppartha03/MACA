@@ -9,7 +9,7 @@ from postprocessing import VoidPostprocessor
 
 from domain_knowledge import EmptyDomainKnowledge
 from conversation_listeners import LoggingListener
-from conversation_listeners import Feedback
+from conversation_listeners import Scoring
 
 system_description = {
     'input' : {
@@ -46,7 +46,7 @@ system_description = {
     },
     'listeners' : {
         'named' : {
-            'feedback' : { 'class' : Feedback.SampleFeedback }
+            'scoring' : { 'class' : Scoring.SampleScoring }
         },
         'unnamed': [
             {
