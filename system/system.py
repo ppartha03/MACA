@@ -31,7 +31,7 @@ class System(PubSub.Publisher):
         output_system = System(input_device, output_device, preprocessing, postprocessing, listeners, agent, domain_knowledge)
         listeners.subscribe(output_system, (system_channels.INPUT, system_channels.OUTPUT))
 
-        output_system.accept_subscription(agent, channels = (system_channels.FEEDBACK,))
+        output_system.accept_subscription(agent, channels = (system_channels.SCORING,))
         return output_system
 
     """
@@ -58,53 +58,47 @@ class System(PubSub.Publisher):
         """
         self.runtime_config = config
 
+    def _input_routine(self):
+        """
+            Return whether any input was processed.
+        """
+        raw_inputs = self.input_device.take_input()
+        if not raw_inputs:
+            return False
+
+        self.publish(raw_inputs, channel = system_channels.INPUT)
+
+        processed_inputs = [self.preprocessing.preprocess(data) for data in raw_inputs]
+        self.agent.process_inputs(processed_inputs)
+
+        return True
+
+    def _output_routine(self):
+        try:
+            next_output = self.agent.next_output(timeout = self.runtime_config['io_timeout'])
+            if next_output:
+                processed_outputs = self.postprocessing.postprocess(next_output)
+                self.publish(processed_outputs, channel = system_channels.OUTPUT)
+
+                to_write = self.postprocessing.get_output(processed_outputs)
+
+                self.output_device.write_output(to_write)
+        except: # Notify exception
+            traceback.print_exc()
+
     def input_loop(self):
         while not self.terminate:
-            raw_inputs = self.input_device.take_input()
-            if not raw_inputs:
-                continue
-
-            self.publish(raw_inputs, channel = system_channels.INPUT)
-
-            processed_inputs = [self.preprocessing.preprocess(data) for data in raw_inputs]
-            self.agent.process_inputs(processed_inputs)
+            self._input_routine()
 
     def output_loop(self):
         while not self.terminate:
-            try:
-                next_output = self.agent.next_output(timeout = self.runtime_config['io_timeout'])
-                if next_output:
-                    processed_outputs = self.postprocessing.postprocess(next_output)
-                    self.publish(processed_outputs, channel = system_channels.OUTPUT)
-
-                    to_write = self.postprocessing.get_output(processed_outputs)
-
-                    self.output_device.write_output(to_write)
-            except: # Notify exception
-                traceback.print_exc()
+            self._output_routine()
 
     def run(self):
         """
             Single loop implementation
         """
         while not self.terminate:
-            raw_inputs = self.input_device.take_input()
-            if not raw_inputs:
+            if not self._input_routine():
                 continue
-
-            self.publish(raw_inputs, channel = system_channels.INPUT)
-
-            processed_inputs = [self.preprocessing.preprocess(data) for data in raw_inputs]
-            self.agent.process_inputs(processed_inputs)
-
-            try:
-                next_output = self.agent.next_output(timeout = self.runtime_config['io_timeout'])
-                if next_output:
-                    processed_outputs = self.postprocessing.postprocess(next_output)
-                    self.publish(processed_outputs, channel = system_channels.OUTPUT)
-
-                    to_write = self.postprocessing.get_output(processed_outputs)
-
-                    self.output_device.write_output(to_write)
-            except: # Notify exception
-                traceback.print_exc()
+            self._output_routine()

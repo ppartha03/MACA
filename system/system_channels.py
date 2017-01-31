@@ -1,4 +1,4 @@
 
-FEEDBACK = 'feedback'
+SCORING = 'scoring'
 INPUT = 'input'
 OUTPUT = 'output'
