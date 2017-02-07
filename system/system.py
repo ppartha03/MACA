@@ -69,7 +69,7 @@ class System(PubSub.Publisher):
         self.publish(raw_inputs, channel = system_channels.INPUT)
 
         processed_inputs = [self.preprocessing.preprocess(data) for data in raw_inputs]
-        self.agent.process_inputs(processed_inputs)
+        self.agent.full_process(processed_inputs)
 
         return True
 

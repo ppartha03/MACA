@@ -14,10 +14,10 @@ class AbstractAgent(PubSub.Subscriber):
         super(AbstractAgent, self).__init__()
         self.output_data = Queue.Queue() # Synchronized blocking queue to stored pending output.
 
-    @abc.abstractmethod
-    def process_inputs(self, inputs):
+    def model_preprocess(self, inputs):
         """
-            Process user text inputs.
+            Internal preprocessing of the models. Output of this will be passed on to the main internal processing of the model.
+            Override if need be to perform any required internal preprocessing.
 
             Parameters
             ----------
@@ -25,9 +25,62 @@ class AbstractAgent(PubSub.Subscriber):
 
             Returns
             -------
-            None
+            Appropriate outputs to pass on to the main internal processing. Alternatively this can modify model's internal state.
+        """
+        return inputs
+
+    @abc.abstractmethod
+    def model_postprocess(self, outputs):
+        """
+            Internal postprocessing of the models. Output of this will be passed on to postprocessing unit of the system.
+            Override to need be to perform any required internal postprocessing.
+
+            After this method finishes, appropriate outputs MUST be put onto the output queue, ready for the system postprocessing module.
+            Use method queue_output avaialble in this class to enqueue the output.
+
+            Parameters
+            ----------
+            inputs : output of the main internal processing of the model.
+
+            Returns
+            -------
+            None. Output of appropriate formats are put onto the output queue.
+
         """
         pass
+
+    @abc.abstractmethod
+    def process_inputs(self, inputs):
+        """
+            Process user inputs. This is the main internal processing of the model. Data must have been preprocessed internally
+            before coming to this method.
+
+            Parameters
+            ----------
+            inputs : data from model internal preprocessing.
+
+            Returns
+            -------
+            Appropriate output for model internal postprocessing.
+        """
+        pass
+
+    def full_process(self, inputs):
+        """
+            Full processing pipeline of the model. This includes preprocessing, main internal processing and postprocessing.
+            This method MUST NOT be overriden.
+
+            Parameters
+            ----------
+            inputs : data from system preprocessing.
+
+            Returns
+            -------
+            Output from model internal postprocess.
+        """
+        preprocessed = self.model_preprocess(inputs)
+        raw_response = self.process_inputs(preprocessed)
+        return self.model_postprocess(raw_response)
 
 
     def next_output(self, timeout = None):

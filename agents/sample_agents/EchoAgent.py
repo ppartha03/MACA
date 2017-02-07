@@ -15,9 +15,12 @@ class EchoAgent(AbstractAgent):
     		Expecting a list of inputs. Each input is a list of preprocessed data.
     		This agent picks the first preprocessed data in the input.
     	"""
+        return [data[0] for data in inputs]
 
-        for data in inputs:
-            self.queue_output(data[0])
+
+    def model_postprocess(self, outputs):
+        for data in outputs:
+            self.queue_output(data)
 
     def process_notification(self, content, channel):
         logger.info("Agent received notification {0} on channel {1}.".format(content, channel))

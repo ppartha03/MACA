@@ -68,16 +68,18 @@ class HREDAgent(AbstractAgent):
         # Start chat loop
         self.utterances = collections.deque()
 
-    def process_inputs(self, inputs):
-        for data in inputs:
-            var = data[0].data
+    def model_preprocess(self, inputs):
+        return [[ self.model.end_sym_utterance ] + ['<first_speaker>'] + data[0].data + [ self.model.end_sym_utterance ] for data in inputs]
 
+    def process_inputs(self, inputs):
+        outputs = []
+
+        for current_utterance in inputs:
             # Increase number of utterances. We just set it to zero for simplicity so that model has no memory.
             # But it works fine if we increase this number
             while len(self.utterances) > 0:
                 self.utterances.popleft()
 
-            current_utterance = [ self.model.end_sym_utterance ] + ['<first_speaker>'] + var.split() + [ self.model.end_sym_utterance ]
             self.utterances.append(current_utterance)
 
             #TODO Sample a random reply. To spice it up, we could pick the longest reply or the reply with the fewest placeholders...
@@ -94,4 +96,10 @@ class HREDAgent(AbstractAgent):
             self.utterances.append(sentences[0][0].split())
 
             reply = sentences[0][0].encode('utf-8')
-            self.queue_output(TextData(chat.remove_speaker_tokens(reply)))
+            outputs.append(reply)
+
+        return outputs
+
+    def model_postprocess(self, outputs):
+        for output in outputs:
+            self.queue_output(TextData(chat.remove_speaker_tokens(output)))
