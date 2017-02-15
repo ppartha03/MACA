@@ -38,8 +38,8 @@ class HREDAgent(AbstractAgent):
         Need to enable certain Theano flags when using.
         THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32
     """
-    def __init__(self):
-        super(HREDAgent, self).__init__()
+    def __init__(self, domain_knowledge = None):
+        super(HREDAgent, self).__init__(domain_knowledge)
         state = prototype_ubuntu_HRED() #prototype_state()
 
         state_path = config['model_prefix'] + "_state.pkl"

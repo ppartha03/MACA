@@ -7,8 +7,8 @@ class EchoAgent(AbstractAgent):
     """
         Simply echo the input to the output.
     """
-    def __init__(self):
-        super(EchoAgent, self).__init__()
+    def __init__(self, domain_knowledge = None):
+        super(EchoAgent, self).__init__(domain_knowledge)
 
     def process_inputs(self, inputs):
     	"""

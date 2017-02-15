@@ -12,8 +12,8 @@ class POMDPAgent(AbstractAgent):
         Implementation of POMPDP agent.
         Adoption of implementation from https://github.com/mbforbes/py-pomdp
     """
-    def __init__(self):
-        super(POMDPAgent, self).__init__()
+    def __init__(self, domain_knowledge = None):
+        super(POMDPAgent, self).__init__(domain_knowledge)
 
         self.observation_index = 0
 
@@ -21,7 +21,8 @@ class POMDPAgent(AbstractAgent):
         self.model = pomdp.POMDP(
             'agents/pomdp/examples/env/voicemail.pomdp',  # env
             'agents/pomdp/examples/policy/voicemail.policy',  # policy
-            np.array([[0.65], [0.35]])  # prior
+            np.array([[0.65], [0.35]]),  # prior
+            domain_knowledge
         )
 
         self.terminated = False

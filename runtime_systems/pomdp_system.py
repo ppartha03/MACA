@@ -6,7 +6,7 @@ from agents.pomdp import POMDPAgent
 from preprocessing import VoidPreprocessor
 from postprocessing import VoidPostprocessor
 
-from domain_knowledge import EmptyDomainKnowledge
+from domain_knowledge import POMDPDomainKnowledge
 from conversation_listeners import LoggingListener
 from conversation_listeners import Scoring
 
@@ -38,7 +38,7 @@ system_description = {
         'class' : POMDPAgent.POMDPAgent
     },
     'domain_knowledge' : {
-        'class' : EmptyDomainKnowledge.EmptyDomainKnowledge
+        'class' : POMDPDomainKnowledge.VoiceMailPomdpDomainKnowledge
     },
     'listeners' : {
         'named' : {

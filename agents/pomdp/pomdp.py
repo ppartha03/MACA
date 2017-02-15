@@ -27,13 +27,13 @@ class POMDP:
         pomdppolicy POMDPPolicy
         belief      numpy array
     '''
-    def __init__(self, pomdp_env_filename, pomdp_policy_filename, prior):
+    def __init__(self, pomdp_env_filename, pomdp_policy_filename, prior, domain_knowledge):
         '''
         pomdp_env_filename    string
         pomdp_policy_filename string
         prior                 numpy array
         '''
-        self.pomdpenv = POMDPEnvironment(pomdp_env_filename)
+        self.pomdpenv = POMDPEnvironment(pomdp_env_filename, domain_knowledge)
         self.pomdppolicy = POMDPPolicy(pomdp_policy_filename)
         self.belief = prior
 
@@ -98,7 +98,7 @@ class POMDP:
 
 
 class POMDPEnvironment:
-    def __init__(self, filename):
+    def __init__(self, filename, domain_knowledge):
         '''
         Parses .pomdp file and loads info into this object's fields.
 
@@ -123,6 +123,10 @@ class POMDPEnvironment:
         self.T = {}
         self.Z = {}
         self.R = {}
+
+        self.observations = domain_knowledge.get_observations()
+        self.actions = domain_knowledge.get_actions()
+        self.states = domain_knowledge.get_states()
 
         # go through line by line
         i = 0

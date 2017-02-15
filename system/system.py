@@ -21,12 +21,14 @@ class System(PubSub.Publisher):
         postprocessing = PostprocessingUnit.construct_postprocessing_unit(system_description['postprocessing'])
         listeners = ListenerUnit.construct_listener_unit(system_description['listeners'])
 
-        agent = object_creator(system_description['agent'])
         domain_knowledge = object_creator(system_description['domain_knowledge'])
+        if 'kwargs' not in system_description['agent']:
+            system_description['agent']['kwargs'] = {}
+        system_description['agent']['kwargs']['domain_knowledge'] = domain_knowledge # Make domain knowledge available at agent instantiation time
+        agent = object_creator(system_description['agent'])
 
         preprocessing.set_domain_knowledge(domain_knowledge)
         postprocessing.set_domain_knowledge(domain_knowledge)
-        agent.domain_knowledge = domain_knowledge
 
         output_system = System(input_device, output_device, preprocessing, postprocessing, listeners, agent, domain_knowledge)
         listeners.subscribe(output_system, (system_channels.INPUT, system_channels.OUTPUT))

@@ -10,9 +10,10 @@ class AbstractAgent(PubSub.Subscriber):
 
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self):
+    def __init__(self, domain_knowledge = None):
         super(AbstractAgent, self).__init__()
         self.output_data = Queue.Queue() # Synchronized blocking queue to stored pending output.
+        self.domain_knowledge = domain_knowledge
 
     def model_preprocess(self, inputs):
         """
