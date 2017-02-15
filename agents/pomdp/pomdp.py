@@ -137,11 +137,14 @@ class POMDPEnvironment:
             elif line.startswith('values'):
                 i = self.__get_value(i)
             elif line.startswith('states'):
-                i = self.__get_states(i)
+                # i = self.__get_states(i)
+                raise ValueError("State should be previously specified in domain knowledge.")
             elif line.startswith('actions'):
-                i = self.__get_actions(i)
+                # i = self.__get_actions(i)
+                raise ValueError("Actions should be previously specified in domain knowledge.")
             elif line.startswith('observations'):
-                i = self.__get_observations(i)
+                # i = self.__get_observations(i)
+                raise ValueError("Observations should be previously specified in domain knowledge.")
             elif line.startswith('T'):
                 i = self.__get_transition(i)
             elif line.startswith('O'):
