@@ -1,12 +1,12 @@
 from devices import InputDevice
 from devices import OutputDevice
 
-from agents.hred.gods_agent import hred_agent  # hred_agent.HREDAgent
+from sample_systems.pomdp import POMDPAgent
 
-from agents.hred import hred_preprocessing
+from preprocessing import VoidPreprocessor
 from postprocessing import VoidPostprocessor
 
-from domain_knowledge import EmptyDomainKnowledge
+from sample_systems.pomdp import POMDPDomainKnowledge
 from conversation_listeners import LoggingListener
 from conversation_listeners import Scoring
 
@@ -20,7 +20,7 @@ system_description = {
     },
     'preprocessing' : [ # Happens in parallel
         {
-            'class' : hred_preprocessing.HredPreprocessor,
+            'class' : VoidPreprocessor.VoidPreprocessor,
         }
     ],
     'postprocessing' : {
@@ -35,10 +35,10 @@ system_description = {
         ]
     },
     'agent' : {
-        'class' : hred_agent.HREDAgent
+        'class' : POMDPAgent.POMDPAgent
     },
     'domain_knowledge' : {
-        'class' : EmptyDomainKnowledge.EmptyDomainKnowledge
+        'class' : POMDPDomainKnowledge.VoiceMailPomdpDomainKnowledge
     },
     'listeners' : {
         'named' : {

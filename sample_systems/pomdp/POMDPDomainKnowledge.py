@@ -2,7 +2,7 @@ import abc
 
 import numpy as np
 
-from AbstractDomainKnowledge import AbstractDomainKnowledge
+from domain_knowledge.AbstractDomainKnowledge import AbstractDomainKnowledge
 
 class AbstractPOMDPDomainKnowledge(AbstractDomainKnowledge):
 

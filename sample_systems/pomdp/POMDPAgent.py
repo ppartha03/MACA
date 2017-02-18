@@ -1,7 +1,7 @@
 from agents.AbstractAgent import AbstractAgent
 
 import numpy as np
-from agents.pomdp import pomdp
+from sample_systems.pomdp import pomdp
 from TextData import TextData
 
 import logging
@@ -19,8 +19,8 @@ class POMDPAgent(AbstractAgent):
 
         # Load 'full POMDP' using env, policy, and belief prior.
         self.model = pomdp.POMDP(
-            'agents/pomdp/examples/env/voicemail.pomdp',  # env
-            'agents/pomdp/examples/policy/voicemail.policy',  # policy
+            'sample_systems/pomdp/examples/env/voicemail.pomdp',  # env
+            'sample_systems/pomdp/examples/policy/voicemail.policy',  # policy
             np.array([[0.65], [0.35]]),  # prior
             domain_knowledge
         )

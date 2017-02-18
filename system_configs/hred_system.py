@@ -1,10 +1,9 @@
 from devices import InputDevice
 from devices import OutputDevice
 
-# from agents.hred.gods_agent import hred_agent  # hred_agent.HREDAgent
-from agents.sample_agents import EchoAgent
+from sample_systems.hred.gods_agent import hred_agent
 
-from preprocessing import VoidPreprocessor
+from sample_systems.hred import hred_preprocessing
 from postprocessing import VoidPostprocessor
 
 from domain_knowledge import EmptyDomainKnowledge
@@ -21,10 +20,7 @@ system_description = {
     },
     'preprocessing' : [ # Happens in parallel
         {
-            'class' : VoidPreprocessor.VoidPreprocessor,
-        },
-        {
-            'class' : VoidPreprocessor.VoidPreprocessor,
+            'class' : hred_preprocessing.HredPreprocessor,
         }
     ],
     'postprocessing' : {
@@ -39,7 +35,7 @@ system_description = {
         ]
     },
     'agent' : {
-        'class' : EchoAgent.EchoAgent
+        'class' : hred_agent.HREDAgent
     },
     'domain_knowledge' : {
         'class' : EmptyDomainKnowledge.EmptyDomainKnowledge

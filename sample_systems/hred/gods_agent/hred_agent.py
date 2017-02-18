@@ -20,12 +20,12 @@ from random import randint
 
 import theano
 
-from agents.hred import search
-from agents.hred.dialog_encdec import DialogEncoderDecoder
-from agents.hred.numpy_compat import argpartition
-from agents.hred.state import prototype_ubuntu_HRED #prototype_state
+from sample_systems.hred import search
+from sample_systems.hred.dialog_encdec import DialogEncoderDecoder
+from sample_systems.hred.numpy_compat import argpartition
+from sample_systems.hred.state import prototype_ubuntu_HRED #prototype_state
 
-from agents.hred import chat
+from sample_systems.hred import chat
 
 from agents.AbstractAgent import AbstractAgent
 from TextData import TextData

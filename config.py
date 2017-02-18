@@ -3,7 +3,7 @@ nltk.data.path.append("/NOBACKUP/nltk_data")
 
 config = {
 	'io_timeout' : 10,
-	'system_description_file' : './runtime_systems/pomdp_system.py'
-	# 'system_description_file' : './runtime_systems/hred_system.py'
-	# 'system_description_file' : './runtime_systems/sample_system.py'
+	# 'system_description_file' : './system_configs/echo_system.py'
+	'system_description_file' : './system_configs/hred_system.py'
+	# 'system_description_file' : './system_configs/pomdp_system.py'
 }

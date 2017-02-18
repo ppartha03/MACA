@@ -1,12 +1,12 @@
 from devices import InputDevice
 from devices import OutputDevice
 
-from agents.pomdp import POMDPAgent
+from sample_systems.echo import EchoAgent
 
 from preprocessing import VoidPreprocessor
 from postprocessing import VoidPostprocessor
 
-from domain_knowledge import POMDPDomainKnowledge
+from domain_knowledge import EmptyDomainKnowledge
 from conversation_listeners import LoggingListener
 from conversation_listeners import Scoring
 
@@ -19,6 +19,9 @@ system_description = {
         'args' : ['out.gods']
     },
     'preprocessing' : [ # Happens in parallel
+        {
+            'class' : VoidPreprocessor.VoidPreprocessor,
+        },
         {
             'class' : VoidPreprocessor.VoidPreprocessor,
         }
@@ -35,10 +38,10 @@ system_description = {
         ]
     },
     'agent' : {
-        'class' : POMDPAgent.POMDPAgent
+        'class' : EchoAgent.EchoAgent
     },
     'domain_knowledge' : {
-        'class' : POMDPDomainKnowledge.VoiceMailPomdpDomainKnowledge
+        'class' : EmptyDomainKnowledge.EmptyDomainKnowledge
     },
     'listeners' : {
         'named' : {
