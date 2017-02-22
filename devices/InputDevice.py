@@ -2,11 +2,12 @@ import abc
 import sys
 from select import select
 
+from utils.abstract_designs import PubSub
 
 from config import config
 from TextData import TextData
 
-class AbstractInputDevice(object):
+class AbstractInputDevice(PubSub.Publisher):
     """
         AbstractInputDevice: represent an abstract natural language input source (e.g. voice, cmd line, ...)
     """

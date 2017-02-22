@@ -18,6 +18,17 @@ class AbstractOutputDevice(object):
         """
         pass
 
+class VoidOutputDevice(AbstractOutputDevice):
+    """
+        Does nothing to output.
+    """
+
+    def __init__(self):
+        super(VoidOutputDevice, self).__init__()
+
+    def write_output(self, output):
+        pass
+
 class StdoutOutputDevice(AbstractOutputDevice):
     """
         An output device that outputs to the stdout stream.

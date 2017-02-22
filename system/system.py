@@ -33,7 +33,8 @@ class System(PubSub.Publisher):
         output_system = System(input_device, output_device, preprocessing, postprocessing, listeners, agent, domain_knowledge)
         listeners.subscribe(output_system, (system_channels.INPUT, system_channels.OUTPUT))
 
-        output_system.accept_subscription(agent, channels = (system_channels.SCORING,))
+        output_system.accept_subscription(agent, channels = (system_channels.TRAINING, system_channels.SCORING,))
+        input_device.accept_subscription(agent, channels = (system_channels.TRAINING,))
         return output_system
 
     """
