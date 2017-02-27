@@ -27,7 +27,9 @@ class AbstractInputDevice(PubSub.Publisher):
         pass
 
 class StdinInputDevice(AbstractInputDevice):
-    """docstring for StdinInputDevice"""
+    """
+        Input device that reads from stdin line by line.
+    """
     def __init__(self):
         super(StdinInputDevice, self).__init__()
 
@@ -49,3 +51,20 @@ class StdinInputDevice(AbstractInputDevice):
             return [TextData(data)]
         else:
             return []
+
+
+class FileInputDevice(AbstractInputDevice):
+    """
+        Input device that reads from file line by line.
+    """
+    def __init__(self, file_name, read_mode = 'r'):
+        super(FileInputDevice, self).__init__()
+
+        reader = open(file_name, read_mode)
+
+    def take_input(self):
+        try:
+            next_line = next(reader)
+            return [TextData(next_line)]
+        except StopIteration: # End of file
+            reader.close()

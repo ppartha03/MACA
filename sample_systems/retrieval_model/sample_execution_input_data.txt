@@ -1,0 +1,5 @@
+<first_speaker> <at> i 'm not a woman , i 'm a woman . i don 't want to be a woman .
+<second_speaker> <at> that 's the spirit ! ! !
+<first_speaker> <at> <unk>
+<first_speaker> <at> i got you . i got you .
+<second_speaker> <at> i want some !
