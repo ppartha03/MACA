@@ -78,7 +78,7 @@ class System(PubSub.Publisher):
 
     def _output_routine(self):
         try:
-            next_output = self.agent.next_output(timeout = self.runtime_config['io_timeout'])
+            next_output = self.agent.next_output(timeout = self.runtime_config['output_queue_timeout'])
             if next_output:
                 processed_outputs = self.postprocessing.postprocess(next_output)
                 self.publish(processed_outputs, channel = system_channels.OUTPUT)
@@ -102,6 +102,5 @@ class System(PubSub.Publisher):
             Single loop implementation
         """
         while not self.terminate:
-            if not self._input_routine():
-                continue
+            self._input_routine()
             self._output_routine()

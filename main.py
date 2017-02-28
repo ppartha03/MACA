@@ -1,4 +1,7 @@
 import logging
+import traceback
+import argparse
+import os
 import time
 import signal
 import threading
@@ -18,7 +21,13 @@ if __name__ == "__main__":
                     level=logging.DEBUG)
     logger = logging.getLogger(__name__)
 
-    system_description = file_utils.load_module(config['system_description_file']).system_description
+    parser = argparse.ArgumentParser(description = 'Track files and directories for changes')
+    parser.add_argument('-f', '--config-file', dest='config_file', default=config['system_description_file'], help='Path to config file.', type = str)
+    args = parser.parse_args()
+
+    assert os.path.isfile(args.config_file)
+
+    system_description = file_utils.load_module(args.config_file).system_description
     system_object = system.System.construct_system(system_description)
     system_object.configure(config)
 
@@ -43,9 +52,22 @@ if __name__ == "__main__":
     main_loop.start()
 
     try:
-        while True:
-            time.sleep(0.1)
+        # If use cusom main function, provide the system object.
+        if 'main_function' in config:
+            config['main_function'](system_object)
+        else:
+            while True:
+                time.sleep(0.1)
     except KeyboardInterrupt:
         print("Terminating gods...")
         terminate()
         print("Terminating main thread...")
+    except:
+        message = traceback.format_exc()
+        logger.critical(message)
+        print("Encountered exception when running main function.")
+        terminate()
+        print("Terminating main thread...")
+
+    terminate() # Do it again in case the main function caught the interrupt signal
+    print("System terminated!")
