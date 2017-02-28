@@ -65,6 +65,16 @@ class RetrievalModelAgent(AbstractAgent):
 
     def process_inputs(self, inputs):
         """
+            Feed input to internal model.
+
+            Parameters
+            ----------
+            inputs : a list of pairs of (context, response).
+
+            Returns
+            -------
+            A list of array, each array has size of batch size. Each entry of each array is the model prediction on whether the context fits with the given response.
+            If there are more input rows than batch size, there will be multiple matrices at output.
         """
         data = {'c' : [row[0] for row in inputs], 'r' : [row[1] for row in inputs], 'y' : [1] * len(inputs)}
 
@@ -78,8 +88,19 @@ class RetrievalModelAgent(AbstractAgent):
         return TextData(results)
 
     def model_preprocess(self, inputs):
+        """
+            For each pair of (context, response), lookup the appropriate index of the word in the dictionary.
+
+            Parameters
+            ----------
+            inputs : a list of pairs of (context, response).
+
+            Returns
+            -------
+            Same list of pairs but words are replaced by their respective indices in the dictionary.
+        """
         inputs = inputs[0] # Only take the first preprocessed data
-        return [[[self.index_dictionary.get(word, 1) for word in segment.split()] for segment in bpe_segments] for bpe_segments in inputs]
+        return [[[self.index_dictionary.get(word, 0) for word in segment.split()] for segment in bpe_segments] for bpe_segments in inputs]
 
     def model_postprocess(self, outputs):
         if outputs is None:
