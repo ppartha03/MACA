@@ -64,12 +64,12 @@ def save(model, timings, post_fix = ''):
     # ignore keyboard interrupt while saving
     start = time.time()
     s = signal.signal(signal.SIGINT, signal.SIG_IGN)
-    
+
     model.save(model.state['save_dir'] + '/' + model.state['run_id'] + "_" + model.state['prefix'] + post_fix + 'model.npz')
     cPickle.dump(model.state, open(model.state['save_dir'] + '/' +  model.state['run_id'] + "_" + model.state['prefix'] + post_fix + 'state.pkl', 'w'))
     numpy.savez(model.state['save_dir'] + '/' + model.state['run_id'] + "_" + model.state['prefix'] + post_fix + 'timing.npz', **timings)
     signal.signal(signal.SIGINT, s)
-    
+
     print "Model saved, took {}".format(time.time() - start)
 
 def load(model, filename, parameter_strings_to_ignore):
@@ -83,12 +83,12 @@ def load(model, filename, parameter_strings_to_ignore):
 
     print "Model loaded, took {}".format(time.time() - start)
 
-def main(args):     
-    logging.basicConfig(level = logging.DEBUG,
-                        format = "%(asctime)s: %(name)s: %(levelname)s: %(message)s")
-   
-    state = eval(args.prototype)() 
-    timings = init_timings() 
+def main(args):
+    # logging.basicConfig(level = logging.DEBUG,
+    #                     format = "%(asctime)s: %(name)s: %(levelname)s: %(message)s")
+
+    state = eval(args.prototype)()
+    timings = init_timings()
 
     auto_restarting = False
     if args.auto_restart:
@@ -97,7 +97,7 @@ def main(args):
 
         directory = state['save_dir']
         if not directory[-1] == '/':
-            directory = directory + '/' 
+            directory = directory + '/'
 
         auto_resume_postfix = state['prefix'] + '_auto_model.npz'
 
@@ -128,13 +128,13 @@ def main(args):
 
     if args.resume != "":
         logger.debug("Resuming %s" % args.resume)
-        
+
         state_file = args.resume + '_state.pkl'
         timings_file = args.resume + '_timing.npz'
-        
+
         if os.path.isfile(state_file) and os.path.isfile(timings_file):
             logger.debug("Loading previous state")
-            
+
             state = cPickle.load(open(state_file, 'r'))
             timings = dict(numpy.load(open(timings_file, 'r')))
             for x, y in timings.items():
@@ -150,12 +150,12 @@ def main(args):
 
     logger.debug("State:\n{}".format(pprint.pformat(state)))
     logger.debug("Timings:\n{}".format(pprint.pformat(timings)))
- 
+
     if args.force_train_all_wordemb == True:
         state['fix_pretrained_word_embeddings'] = False
 
     model = DialogEncoderDecoder(state)
-    rng = model.rng 
+    rng = model.rng
 
     valid_rounds = 0
     save_model_on_first_valid = False
@@ -182,9 +182,9 @@ def main(args):
             load(model, filename, parameter_strings_to_ignore)
         else:
             raise Exception("Cannot resume, cannot find model file!")
-        
+
         if 'run_id' not in model.state:
-            raise Exception('Backward compatibility not ensured! (need run_id in state)')           
+            raise Exception('Backward compatibility not ensured! (need run_id in state)')
 
     else:
         # assign new run_id key
@@ -208,7 +208,7 @@ def main(args):
         eval_grads = model.build_eval_grads()
 
     random_sampler = search.RandomSampler(model)
-    beam_sampler = search.BeamSampler(model) 
+    beam_sampler = search.BeamSampler(model)
 
     logger.debug("Load data")
     train_data, \
@@ -217,9 +217,9 @@ def main(args):
 
     # Start looping through the dataset
     step = 0
-    patience = state['patience'] 
+    patience = state['patience']
     start_time = time.time()
-     
+
     train_cost = 0
     train_kl_divergence_cost = 0
     train_posterior_mean_variance = 0
@@ -258,9 +258,9 @@ def main(args):
             # Restart training
             logger.debug("Got None...")
             break
-        
+
         logger.debug("[TRAIN] - Got batch %d,%d" % (batch['x'].shape[1], batch['max_length']))
-        
+
         x_data = batch['x']
         x_data_reversed = batch['x_reversed']
         max_length = batch['max_length']
@@ -411,9 +411,9 @@ def main(args):
                     # Validation finished
                     if not batch:
                         break
-                     
+
                     logger.debug("[VALID] - Got batch %d,%d" % (batch['x'].shape[1], batch['max_length']))
-        
+
                     x_data = batch['x']
                     x_data_reversed = batch['x_reversed']
                     max_length = batch['max_length']
@@ -430,14 +430,14 @@ def main(args):
                     # (the first token is always assumed to be eos)
                     c_list = c_list.reshape((batch['x'].shape[1],max_length-1), order=(1,0))
                     c_list = numpy.sum(c_list, axis=1)
-                    
+
                     words_in_dialogues = numpy.sum(x_cost_mask, axis=0)
                     c_list = c_list / words_in_dialogues
-                    
+
 
                     if numpy.isinf(c) or numpy.isnan(c):
                         continue
-                    
+
                     valid_cost += c
                     valid_kl_divergence_cost += kl_divergence_cost
                     valid_posterior_mean_variance += posterior_mean_variance
@@ -451,8 +451,8 @@ def main(args):
                     valid_wordpreds_done += batch['num_preds']
                     valid_dialogues_done += batch['num_dialogues']
 
-                logger.debug("[VALIDATION END]") 
-                 
+                logger.debug("[VALIDATION END]")
+
                 valid_cost /= valid_wordpreds_done
                 valid_kl_divergence_cost /= valid_wordpreds_done
                 valid_posterior_mean_variance /= valid_dialogues_done

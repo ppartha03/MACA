@@ -3,18 +3,18 @@ import cPickle
 import os
 
 def prototype_state():
-    state = {} 
+    state = {}
 
     # ----- CONSTANTS -----
     # Random seed
     state['seed'] = 1234
-    
+
     # Logging level
     state['level'] = 'DEBUG'
 
     # Out-of-vocabulary token string
     state['oov'] = '<unk>'
-    
+
     # These are end-of-sequence marks
     state['end_sym_utterance'] = '</s>'
 
@@ -40,7 +40,7 @@ def prototype_state():
     # This requires qdim_decoder = 2x rankdim
     state['maxout_out'] = False
 
-    # If this flag is on, a two-layer MLPs will applied on the utterance decoder hidden state before 
+    # If this flag is on, a two-layer MLPs will applied on the utterance decoder hidden state before
     # outputting the distribution over words.
     state['deep_out'] = True
 
@@ -52,18 +52,18 @@ def prototype_state():
     state['sent_rec_activation'] = 'lambda x: T.tanh(x)'
     # The dialogue encoder activation function
     state['dialogue_rec_activation'] = 'lambda x: T.tanh(x)'
-    
+
     # Determines how to input the utterance encoder and dialogue encoder into the utterance decoder RNN hidden state:
     #  - 'first': initializes first hidden state of decoder using encoders
-    #  - 'all': initializes first hidden state of decoder using encoders, 
+    #  - 'all': initializes first hidden state of decoder using encoders,
     #            and inputs all hidden states of decoder using encoders
-    #  - 'selective': initializes first hidden state of decoder using encoders, 
+    #  - 'selective': initializes first hidden state of decoder using encoders,
     #                 and inputs all hidden states of decoder using encoders.
-    #                 Furthermore, a gating function is applied to the encoder input 
+    #                 Furthermore, a gating function is applied to the encoder input
     #                 to turn off certain dimensions if necessary.
     #
     # Experiments show that 'all' is most effective.
-    state['decoder_bias_type'] = 'all' 
+    state['decoder_bias_type'] = 'all'
 
     # Define the gating function for the three RNNs.
     state['utterance_encoder_gating'] = 'GRU' # Supports 'None' and 'GRU'
@@ -98,7 +98,7 @@ def prototype_state():
     state['qdim_encoder'] = 512
     # Dimensionality of (word-level) utterance decoder (RNN which generates output) hidden state
     state['qdim_decoder'] = 512
-    # Dimensionality of (utterance-level) context encoder hidden layer 
+    # Dimensionality of (utterance-level) context encoder hidden layer
     state['sdim'] = 1000
     # Dimensionality of low-rank word embedding approximation
     state['rankdim'] = 256
@@ -107,7 +107,7 @@ def prototype_state():
     # ----- LATENT VARIABLES WITH VARIATIONAL LEARNING -----
     # If this flag is on, a Gaussian latent variable is added at the beginning of each utterance.
     # The utterance decoder will be conditioned on this latent variable,
-    # and the model will be trained using the variational lower bound. 
+    # and the model will be trained using the variational lower bound.
     # See, for example, the variational auto-encoder by Kingma et al. (2013).
     state['add_latent_gaussian_per_utterance'] = False
     # This flag will condition the latent variable on the dialogue encoder
@@ -164,13 +164,13 @@ def prototype_state():
     # Choose optimization algorithm (adam works well most of the time)
     state['updater'] = 'adam'
     # If this flag is on, NCE (Noise-Contrastive Estimation) will be used to train model.
-    # This is significantly faster for large vocabularies (e.g. more than 20K words), 
+    # This is significantly faster for large vocabularies (e.g. more than 20K words),
     # but experiments show that this degrades performance.
     state['use_nce'] = False
     # Threshold to clip the gradient
     state['cutoff'] = 1.
     # Learning rate. The rate 0.0002 seems to work well across many tasks with adam.
-    # Alternatively, the learning rate can be adjusted down (e.g. 0.00004) 
+    # Alternatively, the learning rate can be adjusted down (e.g. 0.00004)
     # to at the end of training to help the model converge well.
     state['lr'] = 0.0002
     # Early stopping configuration
@@ -178,7 +178,7 @@ def prototype_state():
     state['cost_threshold'] = 1.003
     # Batch size. If out of memory, modify this!
     state['bs'] = 80
-    # Sort by length groups of  
+    # Sort by length groups of
     state['sort_k_batches'] = 20
     # Training examples will be split into subsequences.
     # This parameter controls the maximum size of each subsequence.
@@ -192,7 +192,8 @@ def prototype_state():
     # Validation frequency
     state['valid_freq'] = 5000
     # Number of batches to process
-    state['loop_iters'] = 3000000
+    # MODIFIED
+    state['loop_iters'] = 1 # 3000000
     # Maximum number of minutes to run
     state['time_stop'] = 24*60*31
     # Error level to stop at
@@ -202,8 +203,8 @@ def prototype_state():
 
 def prototype_test():
     state = prototype_state()
-    
-    # Fill paths here! 
+
+    # Fill paths here!
     state['train_dialogues'] = "./tests/data/ttrain.dialogues.pkl"
     state['test_dialogues'] = "./tests/data/ttest.dialogues.pkl"
     state['valid_dialogues'] = "./tests/data/tvalid.dialogues.pkl"
@@ -211,19 +212,19 @@ def prototype_test():
     state['save_dir'] = "./tests/models/"
 
     state['max_grad_steps'] = 20
-    
+
     # Handle pretrained word embeddings. Using this requires rankdim=10
     state['initialize_from_pretrained_word_embeddings'] = False
-    state['pretrained_word_embeddings_file'] = './tests/data/MT_WordEmb.pkl' 
+    state['pretrained_word_embeddings_file'] = './tests/data/MT_WordEmb.pkl'
     state['fix_pretrained_word_embeddings'] = False
-    
+
     state['valid_freq'] = 50
 
     state['collaps_to_standard_rnn'] = False
-    
-    state['prefix'] = "testmodel_" 
+
+    state['prefix'] = "testmodel_"
     state['updater'] = 'adam'
-    
+
     state['maxout_out'] = False
     state['deep_out'] = True
     state['deep_dialogue_input'] = True
@@ -231,14 +232,14 @@ def prototype_test():
     state['utterance_encoder_gating'] = 'GRU'
     state['dialogue_encoder_gating'] = 'GRU'
     state['utterance_decoder_gating'] = 'GRU'
-    state['bidirectional_utterance_encoder'] = True 
+    state['bidirectional_utterance_encoder'] = True
     state['direct_connection_between_encoders_and_decoder'] = True
 
     state['bs'] = 5
     state['sort_k_batches'] = 1
     state['use_nce'] = False
     state['decoder_bias_type'] = 'all'
-    
+
     state['qdim_encoder'] = 15
     state['qdim_decoder'] = 5
     state['sdim'] = 10
@@ -248,8 +249,8 @@ def prototype_test():
 
 def prototype_test_variational():
     state = prototype_state()
-    
-    # Fill paths here! 
+
+    # Fill paths here!
     state['train_dialogues'] = "./tests/data/ttrain.dialogues.pkl"
     state['test_dialogues'] = "./tests/data/ttest.dialogues.pkl"
     state['valid_dialogues'] = "./tests/data/tvalid.dialogues.pkl"
@@ -260,16 +261,16 @@ def prototype_test_variational():
 
     # Handle pretrained word embeddings. Using this requires rankdim=10
     state['initialize_from_pretrained_word_embeddings'] = True
-    state['pretrained_word_embeddings_file'] = './tests/data/MT_WordEmb.pkl' 
+    state['pretrained_word_embeddings_file'] = './tests/data/MT_WordEmb.pkl'
     state['fix_pretrained_word_embeddings'] = True
-    
+
     state['valid_freq'] = 5
 
     state['collaps_to_standard_rnn'] = False
-    
-    state['prefix'] = "testmodel_" 
+
+    state['prefix'] = "testmodel_"
     state['updater'] = 'adam'
-    
+
     state['maxout_out'] = False
     state['deep_out'] = True
     state['deep_dialogue_input'] = True
@@ -297,7 +298,7 @@ def prototype_test_variational():
     state['sort_k_batches'] = 1
     state['use_nce'] = False
     state['decoder_bias_type'] = 'all'
-    
+
     state['qdim_encoder'] = 15
     state['qdim_decoder'] = 5
     state['sdim'] = 10
@@ -310,26 +311,26 @@ def prototype_test_variational():
 # by Serban et al. (2016).
 def prototype_twitter_lstm():
     state = prototype_state()
-    
+
     state['train_dialogues'] = "../TwitterData/Training.dialogues.pkl"
     state['test_dialogues'] = "../TwitterData/Test.dialogues.pkl"
     state['valid_dialogues'] = "../TwitterData/Validation.dialogues.pkl"
-    state['dictionary'] = "../TwitterData/Dataset.dict.pkl" 
-    state['save_dir'] = "Output" 
+    state['dictionary'] = "../TwitterData/Dataset.dict.pkl"
+    state['save_dir'] = "Output"
 
     state['max_grad_steps'] = 80
-    
+
     state['valid_freq'] = 5000
-    
-    state['prefix'] = "TwitterModel_" 
+
+    state['prefix'] = "TwitterModel_"
     state['updater'] = 'adam'
-    
+
     state['deep_dialogue_input'] = True
     state['deep_out'] = True
 
     state['collaps_to_standard_rnn'] = True
- 
-    state['bs'] = 80 
+
+    state['bs'] = 80
     state['decoder_bias_type'] = 'all'
     state['direct_connection_between_encoders_and_decoder'] = False
     state['deep_direct_connection'] = False
@@ -634,9 +635,9 @@ def prototype_ubuntu_HRED():
     state['off_screen_sym'] = -1 # off screen symbol <off_screen>
     state['pause_sym'] = -1 # pause symbol <pause>
 
-    #state['train_dialogues'] = "../UbuntuData/Training.dialogues.pkl"
-    #state['test_dialogues'] = "../UbuntuData/Test.dialogues.pkl"
-    #state['valid_dialogues'] = "../UbuntuData/Validation.dialogues.pkl"
+    state['train_dialogues'] = "/home/ml/rlowe1/UbuntuData/Training.dialogues.pkl"
+    state['test_dialogues'] = "/home/ml/rlowe1/UbuntuData/Test.dialogues.pkl"
+    state['valid_dialogues'] = "/home/ml/rlowe1/UbuntuData/Validation.dialogues.pkl"
     state['dictionary'] = "/home/ml/rlowe1/UbuntuData/Dataset.dict.pkl"
     state['save_dir'] = "Output"
 

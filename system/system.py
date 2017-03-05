@@ -21,7 +21,13 @@ class System(PubSub.Publisher):
         postprocessing = PostprocessingUnit.construct_postprocessing_unit(system_description['postprocessing'])
         listeners = ListenerUnit.construct_listener_unit(system_description['listeners'])
 
+        # Initialize domain knowledge and dataset
         domain_knowledge = object_creator(system_description['domain_knowledge'])
+        dataset = object_creator(system_description['dataset']) if 'dataset' in system_description else None
+        if dataset:
+            dataset.load_data()
+        domain_knowledge.dataset = dataset
+
         if 'kwargs' not in system_description['agent']:
             system_description['agent']['kwargs'] = {}
         system_description['agent']['kwargs']['domain_knowledge'] = domain_knowledge # Make domain knowledge available at agent instantiation time
@@ -31,6 +37,7 @@ class System(PubSub.Publisher):
         postprocessing.set_domain_knowledge(domain_knowledge)
 
         output_system = System(input_device, output_device, preprocessing, postprocessing, listeners, agent, domain_knowledge)
+        listeners.subscribe(input_device, (system_channels.INPUT, ))
         listeners.subscribe(output_system, (system_channels.INPUT, system_channels.OUTPUT))
 
         output_system.accept_subscription(agent, channels = (system_channels.TRAINING, system_channels.SCORING,))
