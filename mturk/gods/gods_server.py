@@ -3,6 +3,7 @@ import traceback
 import json
 import time
 import uuid
+import threading
 from SocketServer import ThreadingMixIn
 import BaseHTTPServer
 
@@ -12,7 +13,7 @@ HOST_NAME = 'localhost'
 PORT_NUMBER = 22222
 
 
-class GodsServer(BaseHTTPServer.BaseHTTPRequestHandler):
+class ResponseCollectionServer(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def _process_response(self, response_payload):
         context_id = response_payload['id']
@@ -77,16 +78,83 @@ class GodsServer(BaseHTTPServer.BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(json.dumps(result))
 
+class ScoringServer(BaseHTTPServer.BaseHTTPRequestHandler):
+
+    def _process_request(self, json_payload):
+        if 'context' in json_payload:
+            data = json_payload['context']
+            new_context = data['data']
+
+            event = threading.Event(0)
+            new_id = self.server.gods_system.input_device.accept_context(new_context)
+            self.server.gods_system.output_device.register_response_event(new_id, event)
+            event.wait(3)
+            response = self.server.gods_system.output_device.get_response(new_id)
+
+            return {
+                'response' : {
+                    'id' : new_id,
+                    'data' : response
+                }
+            }
+        elif 'scoring' in json_payload:
+            data = json_payload['scoring']
+            response_id = data['id']
+            response_score = data['score']
+            self.server.gods_system.input_device.accept_score(response_id, response_score)
+
+            return { 'status' : 'success' }
+
+    def do_HEAD(self):
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+
+    def do_GET(self):
+        """Respond to a GET request."""
+        print self.server.gods_system
+        self.send_response(400)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+        self.wfile.write("<html><head><title>Not supported.</title></head>")
+        self.wfile.write("<body><p>Not supported.</p>")
+
+    def do_OPTIONS(self):
+        self.send_response(200, "ok")
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header("Access-Control-Allow-Headers", "X-Requested-With, Content-type")
+
+    def do_POST(self):
+        """Respond to a POST request."""
+        data_string = self.rfile.read(int(self.headers['Content-Length']))
+        json_payload = json.loads(data_string)
+
+        try:
+            result = self._process_request(json_payload)
+            # result = {'result' : 'sample_result'}
+            status_code = 200
+        except:
+            result = traceback.format_exc()
+            logger.warning(result)
+            status_code = 500
+
+        self.send_response(status_code)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header("Content-type", "application/json")
+        self.end_headers()
+        self.wfile.write(json.dumps(result))
+
 class ThreadedHTTPServer(ThreadingMixIn, BaseHTTPServer.HTTPServer):
     """Handle requests in a separate thread."""
     pass
 
-def main(gods_system):
+def main(server_implementation_class, gods_system):
     logger.info('Initializing gods server.')
 
     # server_class = BaseHTTPServer.HTTPServer
     server_class = ThreadedHTTPServer
-    httpd = server_class((HOST_NAME, PORT_NUMBER), GodsServer)
+    httpd = server_class((HOST_NAME, PORT_NUMBER), server_implementation_class)
     httpd.gods_system = gods_system
 
     logger.info("Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER))
@@ -96,6 +164,12 @@ def main(gods_system):
         logger.info("Caught interrupt signal. Terminating...")
     httpd.server_close()
     logger.info("Server Stops - %s:%s" % (HOST_NAME, PORT_NUMBER))
+
+def main_response(gods_system):
+    main(ResponseCollectionServer, gods_system)
+
+def main_scoring(gods_system):
+    main(ScoringServer, gods_system)
 
 if __name__ == '__main__':
     main(None)

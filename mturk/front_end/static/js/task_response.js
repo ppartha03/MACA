@@ -15,7 +15,7 @@ var mycounterbalance = counterbalance;  // they tell you which condition you hav
 var pages = [
     "instructions/instruct-1.html",
     "instructions/instruct-ready.html",
-    "score.html",
+    "chat.html",
     "postquestionnaire.html"
 ];
 
@@ -164,8 +164,7 @@ var StroopExperiment = function() {
 
     var wordon, // time word is presented
         listening = false;
-    var current_response_id = 0;
-    var current_context = "";
+    var current_context_id = 0;
     var context_count = 0;
 
     // Stimuli for a basic Stroop experiment
@@ -200,22 +199,28 @@ var StroopExperiment = function() {
             .text(text);
     };
 
-    var next = function(new_response) {
-        document.getElementById("conversation").innerHTML += "User: " + current_context + "</br>";
-        document.getElementById("conversation").innerHTML += new_response + "</br>";
-        document.getElementById("user-context").value = "";
+    var next = function(new_context) {
+        document.getElementById("conversation").innerHTML += new_context + "</br>";
+        document.getElementById("user-response").value = "";
         listening = true;
     };
 
-    var get_response = function(context) {
-        var data = { "context" : null };
-
-        if (context) { // Then submit this response together with the get context request.
-            console.log("Submitting context " + context);
-            data.context = { "data" : context };
+    var get_next_context = function(response) {
+        var data = { "response" : null };
+        if (context_count < MAX_CONTEXT_COUNT) {
+            data.context = "";
         }
 
-        var new_response_data = null;
+        if (response) { // Then submit this response together with the get context request.
+            console.log("Submitting response " + response);
+            data.response = {
+                "id" : current_context_id,
+                "data" : response
+            };
+        }
+
+
+        var new_context_data = null;
         xhr = new XMLHttpRequest();
         var url = "http://localhost:22222";
         xhr.open("POST", url, false); // Synchronous request. TODO: handle failed requests.
@@ -224,20 +229,22 @@ var StroopExperiment = function() {
             if (xhr.readyState == 4 && xhr.status == 200) {
                 var json = JSON.parse(xhr.responseText);
 
-                if (json.hasOwnProperty('response')) {
-                    current_response_id = json.response.id;
-                    new_response_data = json.response.data;
+                if (json.hasOwnProperty('context')) {
+                    current_context_id = json.context.id;
+                    new_context_data = json.context.data;
                 }
             }
         }
         xhr.send(JSON.stringify(data));
-        return new_response_data;
+
+        context_count++;
+        return new_context_data;
     };
 
-    var fetch_response = function(context) {
-        var new_response = get_response(context);
-        if (new_response) {
-            next(new_response);
+    var fetch_context = function(response) {
+        var new_context = get_next_context(response);
+        if (new_context) {
+            next(new_context);
         } else {
             finish();
         }
@@ -246,73 +253,47 @@ var StroopExperiment = function() {
     var response_handler = function(e) {
         if (!listening) return;
 
-        var keyCode = e.keyCode;
-        var context = "";
+        var keyCode = e.keyCode,
+            response;
 
         switch (keyCode) {
             case KeyEvent.DOM_VK_RETURN:
                 e.preventDefault(); // So that the new line does not get to insert a new line.
-                context = document.getElementById("user-context").value;
+                response =  document.getElementById("user-response").value;
+                document.getElementById("conversation").innerHTML += response + "</br>";
                 break;
             default:
-                context = "";
+                response = "";
                 break;
         }
 
-        if (context.length > 0) {
+        if (response.length>0) {
             listening = false;
-            current_context = context;
-            fetch_response(context);
+            // var hit = response == stim[1];
+            // var rt = new Date().getTime() - wordon;
+
+            // psiTurk.recordTrialData({'phase':"TEST",
+            //                          'word':stim[0],
+            //                          'color':stim[1],
+            //                          'relation':stim[2],
+            //                          'response':response,
+            //                          'hit':hit,
+            //                          'rt':rt}
+            //                        );
+            fetch_context(response);
         }
-    };
-
-    var scoring_handler = function(e) {
-        // Submit score
-        var score = document.getElementById("user-score").value;
-        var parsed = parseInt(score);
-        if (parsed > 5 || parsed < 1) {
-            alert("Please enter integer between 1 and 5 (inclusive).");
-            return;
-        }
-
-        data = { "scoring" : null };
-        data.scoring = {
-            "id" : current_response_id,
-            "score" : parsed
-        };
-
-        xhr = new XMLHttpRequest();
-        var url = "http://localhost:22222";
-        xhr.open("POST", url, false); // Synchronous request. TODO: handle failed requests.
-        xhr.setRequestHeader("Content-type", "application/json");
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4 && xhr.status == 200) {
-                document.getElementById("conversation").innerHTML += "You rated the previous response with a score of " + score + ".<br>";
-                context_count++;
-                if (context_count == MAX_CONTEXT_COUNT) {
-                    finish();
-                }
-            }
-        }
-        xhr.send(JSON.stringify(data));
-    };
-
-    var regenerate_response_handler = function(e) {
-        fetch_response(current_context);
     };
 
     // Load the stage.html snippet into the body of the page
     // psiTurk.showPage('stage.html');
-    psiTurk.showPage('score.html');
+    psiTurk.showPage('chat.html');
 
     // Register the response handler that is defined above to handle any
     // key down events.
     $("#trial").focus().keydown(response_handler);
-    $("#submit-score").click(scoring_handler);
-    $("#regenerate-response").click(regenerate_response_handler);
 
     // Start the test
-    listening = true;
+    fetch_context(null);
 };
 
 

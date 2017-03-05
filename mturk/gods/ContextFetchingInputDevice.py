@@ -1,8 +1,6 @@
 import Queue
 import uuid
 
-from system import system_channels
-
 from devices import InputDevice
 from TextData import TextData
 

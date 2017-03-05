@@ -28,7 +28,11 @@ class MturkCollectionAgent(AbstractAgent):
         """
             Accept a response from front end client. Immediately enqueue this response at the output queue.
         """
-        self.queue_output(TextData((response_id, response_data)))
+
+        self.queue_output(TextData({
+            "id" : response_id,
+            "data": response_data
+        }))
 
     def process_notification(self, content, channel):
         logger.info("Agent received notification {0} on channel {1}.".format(content, channel))
