@@ -2,6 +2,7 @@ import abc
 import Queue
 
 from utils.abstract_designs import PubSub
+from system import system_modes
 
 class AbstractAgent(PubSub.Subscriber):
     """
@@ -10,10 +11,11 @@ class AbstractAgent(PubSub.Subscriber):
 
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, domain_knowledge = None):
+    def __init__(self, domain_knowledge = None, mode = system_modes.EXECUTION):
         super(AbstractAgent, self).__init__()
         self.output_data = Queue.Queue() # Synchronized blocking queue to stored pending output.
         self.domain_knowledge = domain_knowledge
+        self.mode = mode
 
     def model_preprocess(self, inputs):
         """

@@ -11,10 +11,10 @@ class AbstractDomainKnowledge(object):
     def __init__(self):
         super(AbstractDomainKnowledge, self).__init__()
 
-        self.data = None # Data used to train/validate/test the model. See class AbstractDataSet below
+        self.dataset = None # Data used to train/validate/test the model. See class AbstractDataset below
 
 
-class AbstractDataSet(object):
+class AbstractDataset(object):
     """
         Abstract class for a data set. This class should be able to offer various operations for a data set so that we can easily
         train/validate/test a model.
@@ -23,7 +23,7 @@ class AbstractDataSet(object):
     __metaclass__ = abc.ABCMeta
 
     def __init__(self):
-        super(AbstractDataSet, self).__init__()
+        super(AbstractDataset, self).__init__()
 
     @abc.abstractmethod
     def load_data(self):

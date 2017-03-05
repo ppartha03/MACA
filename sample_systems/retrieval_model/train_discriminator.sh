@@ -11,6 +11,6 @@ THEANO_FLAGS='floatX=float32,device=gpu3' python main.py \
     --input_dir './twitter_dataset' \
     --dataset_fname 'dataset_twitter_bpe.pkl' \
     --W_fname 'W_twitter_bpe.pkl' \
-    --n_epochs 10 \
+    --n_epochs 1 \
     --save_model True
 

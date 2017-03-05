@@ -553,6 +553,11 @@ class Model:
         n_val_batches = len(self.data['val']['y']) // self.batch_size
         n_test_batches = len(self.data['test']['y']) // self.batch_size
 
+        n_train_batches = min(2, n_train_batches)
+        n_val_batches = min(2, n_val_batches)
+        n_test_batches = min(2, n_test_batches)
+
+
         while (epoch < n_epochs):
             epoch += 1
             indices = range(n_train_batches)
@@ -580,14 +585,16 @@ class Model:
             train_perf = 1 - np.sum(train_losses) / len(self.data['train']['y'])
             print "epoch %i, train perf %f" % (epoch, train_perf*100)
             # evaluation for each model id in data['train']['id']
-            self.compute_performace_models("train")
+            # MODIFIED
+            # self.compute_performace_models("train")
 
             # Compute VALIDATION performance:
             val_losses = [self.compute_loss(self.data['val'], i) for i in xrange(n_val_batches)]
             val_perf = 1 - np.sum(val_losses) / len(self.data['val']['y'])
             print 'epoch %i, val_perf %f' % (epoch, val_perf*100)
             # evaluation for each model id in data['val']['id']
-            self.compute_performace_models("val")
+            # MODIFIED
+            # self.compute_performace_models("val")
 
             # If doing better on validation set:
             if val_perf > best_val_perf:
@@ -598,7 +605,8 @@ class Model:
                 test_perf = 1 - np.sum(test_losses) / len(self.data['test']['y'])
                 print 'epoch %i, test_perf %f' % (epoch, test_perf*100)
                 # evaluation for each model id in data['test']['id']
-                self.compute_performace_models("test")
+                # MODIFIED
+                # self.compute_performace_models("test")
 
                 # Save current best model parameters.
                 print "\nSaving current model parameters..."
