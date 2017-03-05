@@ -1,5 +1,6 @@
 from agents.AbstractAgent import AbstractAgent
 from system import system_channels
+from system import system_modes
 
 import logging
 logger = logging.getLogger(__name__)
@@ -8,16 +9,15 @@ class EchoAgent(AbstractAgent):
     """
         Simply echo the input to the output.
     """
-    def __init__(self, domain_knowledge = None, is_training = False):
-        super(EchoAgent, self).__init__(domain_knowledge)
-        self.is_training = is_training
+    def __init__(self, domain_knowledge = None, mode = system_modes.EXECUTION):
+        super(EchoAgent, self).__init__(domain_knowledge, mode)
 
     def process_inputs(self, inputs):
     	"""
     		Expecting a list of inputs. Each input is a list of preprocessed data.
     		This agent picks the first preprocessed data in the input.
     	"""
-        if self.is_training:
+        if self.mode == system_modes.TRAINING:
             logger.info("Echo agent received inputs {} in training mode.".format(inputs))
             return [None]
         else:

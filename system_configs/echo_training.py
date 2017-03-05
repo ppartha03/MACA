@@ -11,6 +11,8 @@ from domain_knowledge import EmptyDomainKnowledge
 from conversation_listeners import LoggingListener
 from conversation_listeners import Scoring
 
+from system import system_modes
+
 system_description = {
     'input' : {
         'class' : EchoTrainingInput.EchoTrainingInput,
@@ -43,7 +45,7 @@ system_description = {
     'agent' : {
         'class' : EchoAgent.EchoAgent,
         'kwargs' : {
-            'is_training' : True
+            'mode' : system_modes.TRAINING
         }
     },
     'domain_knowledge' : {
