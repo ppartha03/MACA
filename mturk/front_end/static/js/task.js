@@ -207,12 +207,27 @@ var StroopExperiment = function() {
         listening = true;
     };
 
-    var get_response = function(context) {
+    var get_response = function(context, include_scoring) {
         var data = { "context" : null };
 
         if (context) { // Then submit this response together with the get context request.
             console.log("Submitting context " + context);
             data.context = { "data" : context };
+        }
+
+        if (include_scoring && current_response_id !== 0) {
+            var score = document.getElementById("user-score").value;
+
+            var parsed = parseInt(score);
+            if (score === "" || (!isNaN(score) && (parsed > 5 || parsed < 1))) {
+                alert("Please enter integer between 1 and 5 (inclusive).");
+                return false;
+            }
+
+            data.scoring = {
+                "id" : current_response_id,
+                "score" : parsed
+            };
         }
 
         var new_response_data = null;
@@ -234,9 +249,12 @@ var StroopExperiment = function() {
         return new_response_data;
     };
 
-    var fetch_response = function(context) {
-        var new_response = get_response(context);
-        if (new_response) {
+    var fetch_response = function(context, include_scoring) {
+        var new_response = get_response(context, include_scoring);
+        if (new_response === false) { // Front end error, not back end. We can continue
+            listening = true;
+            return;
+        } else if (new_response) {
             next(new_response);
         } else {
             finish();
@@ -247,58 +265,17 @@ var StroopExperiment = function() {
         if (!listening) return;
 
         var keyCode = e.keyCode;
-        var context = "";
-
-        switch (keyCode) {
-            case KeyEvent.DOM_VK_RETURN:
-                e.preventDefault(); // So that the new line does not get to insert a new line.
-                context = document.getElementById("user-context").value;
-                break;
-            default:
-                context = "";
-                break;
-        }
+        var context = document.getElementById("user-context").value;
 
         if (context.length > 0) {
             listening = false;
             current_context = context;
-            fetch_response(context);
+            fetch_response(context, true);
         }
-    };
-
-    var scoring_handler = function(e) {
-        // Submit score
-        var score = document.getElementById("user-score").value;
-        var parsed = parseInt(score);
-        if (parsed > 5 || parsed < 1) {
-            alert("Please enter integer between 1 and 5 (inclusive).");
-            return;
-        }
-
-        data = { "scoring" : null };
-        data.scoring = {
-            "id" : current_response_id,
-            "score" : parsed
-        };
-
-        xhr = new XMLHttpRequest();
-        var url = "http://localhost:22222";
-        xhr.open("POST", url, false); // Synchronous request. TODO: handle failed requests.
-        xhr.setRequestHeader("Content-type", "application/json");
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4 && xhr.status == 200) {
-                document.getElementById("conversation").innerHTML += "You rated the previous response with a score of " + score + ".<br>";
-                context_count++;
-                if (context_count == MAX_CONTEXT_COUNT) {
-                    finish();
-                }
-            }
-        }
-        xhr.send(JSON.stringify(data));
     };
 
     var regenerate_response_handler = function(e) {
-        fetch_response(current_context);
+        fetch_response(current_context, false);
     };
 
     // Load the stage.html snippet into the body of the page
@@ -307,8 +284,8 @@ var StroopExperiment = function() {
 
     // Register the response handler that is defined above to handle any
     // key down events.
-    $("#trial").focus().keydown(response_handler);
-    $("#submit-score").click(scoring_handler);
+    // $("#trial").focus().keydown(response_handler);
+    $("#submit-score").click(response_handler);
     $("#regenerate-response").click(regenerate_response_handler);
 
     // Start the test

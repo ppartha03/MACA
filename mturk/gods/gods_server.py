@@ -81,7 +81,11 @@ class ResponseCollectionServer(BaseHTTPServer.BaseHTTPRequestHandler):
 class ScoringServer(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def _process_request(self, json_payload):
-        if 'context' in json_payload:
+        print "Request: {}".format(json_payload)
+
+        returned_object = {}
+
+        if 'context' in json_payload and json_payload['context']:
             data = json_payload['context']
             new_context = data['data']
 
@@ -91,19 +95,21 @@ class ScoringServer(BaseHTTPServer.BaseHTTPRequestHandler):
             event.wait(3)
             response = self.server.gods_system.output_device.get_response(new_id)
 
-            return {
-                'response' : {
-                    'id' : new_id,
-                    'data' : response
-                }
+            returned_object['response'] = {
+                'id' : new_id,
+                'data' : response
             }
-        elif 'scoring' in json_payload:
+
+        if 'scoring' in json_payload and json_payload['scoring']:
             data = json_payload['scoring']
             response_id = data['id']
             response_score = data['score']
             self.server.gods_system.input_device.accept_score(response_id, response_score)
 
-            return { 'status' : 'success' }
+            returned_object['scoring'] = { 'status' : 'success' }
+
+        print "Returning %s" % returned_object
+        return returned_object if len(returned_object) > 0 else None
 
     def do_HEAD(self):
         self.send_response(200)
