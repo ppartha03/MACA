@@ -1,7 +1,4 @@
 import sys
-from config import config
-sys.path.insert(0, config['theano_path'])
-
 
 import cPickle
 import traceback
@@ -58,18 +55,26 @@ class HREDAgent(AbstractAgent):
         Need to enable certain Theano flags when using.
         THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32
     """
-    def __init__(self, train_args = {}, mode = system_modes.EXECUTION, domain_knowledge = None):
+    def __init__(self, train_args = {},
+                    ignore_unknown_words = True,
+                    normalize = False,
+                    dictionary_path = '/home/ml/rlowe1/UbuntuData/Dataset.dict.pkl',
+                    model_prefix = '/home/2016/pparth2/Desktop/gods/Goal-Oriented_Dialogue_Systems/Pre-Trained_HRED_Model/drive-download-20161021T162213Z/1453999317.44_UbuntuModel_HRED/1453999317.44_UbuntuModel_HRED',
+                    mode = system_modes.EXECUTION, domain_knowledge = None):
         super(HREDAgent, self).__init__(domain_knowledge, mode)
 
         if mode == system_modes.EXECUTION:
             state = prototype_ubuntu_HRED() #prototype_state()
 
-            state_path = config['model_prefix'] + "_state.pkl"
-            model_path = config['model_prefix'] + "_model.npz"
+            state_path = model_prefix + "_state.pkl"
+            model_path = model_prefix + "_model.npz"
 
             with open(state_path) as src:
                 state.update(cPickle.load(src))
-            state['dictionary'] = config['dictionary_path']
+            state['dictionary'] = dictionary_path
+
+            self.ignore_unknown_words = ignore_unknown_words
+            self.normalize = normalize
 
             # MODIFIED: Removed since configuring logging has to be before construction of any logging object
             # logging.basicConfig(level=getattr(logging, state['level']), format="%(asctime)s: %(name)s: %(levelname)s: %(message)s")
@@ -119,7 +124,7 @@ class HREDAgent(AbstractAgent):
 
                 #TODO Retrieve only replies which are generated for second speaker...
                 sentences = chat.sample(self.model, \
-                    seqs= [seqs], ignore_unk=config['ignore_unknown_words'], \
+                    seqs= [seqs], ignore_unk=self.ignore_unknown_words, \
                     sampler=self.sampler, n_samples=1)
 
                 if len(sentences) == 0:

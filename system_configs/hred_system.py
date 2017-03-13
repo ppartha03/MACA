@@ -35,7 +35,13 @@ system_description = {
         ]
     },
     'agent' : {
-        'class' : hred_agent.HREDAgent
+        'class' : hred_agent.HREDAgent,
+        'kwargs' : {
+            'ignore_unknown_words' : True,
+            'normalize' : False,
+            'dictionary_path' : '/home/ml/rlowe1/UbuntuData/Dataset.dict.pkl',
+            'model_prefix' : '/home/2016/pparth2/Desktop/gods/Goal-Oriented_Dialogue_Systems/Pre-Trained_HRED_Model/drive-download-20161021T162213Z/1453999317.44_UbuntuModel_HRED/1453999317.44_UbuntuModel_HRED'
+        }
     },
     'domain_knowledge' : {
         'class' : EmptyDomainKnowledge.EmptyDomainKnowledge
