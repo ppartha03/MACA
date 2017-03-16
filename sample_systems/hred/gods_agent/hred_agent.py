@@ -137,7 +137,6 @@ class HREDAgent(AbstractAgent):
 
             return outputs
         elif self.mode == system_modes.TRAINING:
-            print "Here too"
             train.main(self.args)
 
     def model_postprocess(self, outputs):
