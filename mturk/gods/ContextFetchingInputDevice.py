@@ -2,7 +2,7 @@ import Queue
 import uuid
 
 from devices import InputDevice
-from TextData import TextData
+from MturkData import MturkData
 
 
 class ContextFetchingInputDevice(InputDevice.AbstractInputDevice):
@@ -13,15 +13,12 @@ class ContextFetchingInputDevice(InputDevice.AbstractInputDevice):
         self.timeout_seconds = timeout_seconds
         self.dispatched_inputs = Queue.Queue()
 
-    def request_context(self):
+    def request_context(self, conversation_id):
         """
             Fetch a new input and add to the dispatched queue.
         """
         new_id = uuid.uuid4().hex
-        new_input = {
-            "id" : new_id,
-            "data": "Sample context. {}".format(new_id)
-        }
+        new_input = MturkData(conversation_id, new_id, "Sample context. {}".format(new_id))
 
         self.dispatched_inputs.put(new_input)
         return new_input
@@ -31,6 +28,6 @@ class ContextFetchingInputDevice(InputDevice.AbstractInputDevice):
             Get inputs from the dispatched queue.
         """
         try:
-            return self.dispatched_inputs.get(True, timeout = self.timeout_seconds)
+            return [self.dispatched_inputs.get(True, timeout = self.timeout_seconds)]
         except Queue.Empty:
             return None

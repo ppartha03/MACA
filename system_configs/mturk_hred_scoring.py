@@ -4,9 +4,9 @@ from mturk.gods import NotifiedResponseOutputDevice
 from mturk.gods import DatabaseListener
 from mturk.gods import mturk_scoring_adapters
 
-from sample_systems.echo import EchoAgent
+from sample_systems.hred.gods_agent import hred_agent
 
-from preprocessing import VoidPreprocessor
+from sample_systems.hred import hred_preprocessing
 from postprocessing import VoidPostprocessor
 
 from domain_knowledge import EmptyDomainKnowledge
@@ -27,7 +27,7 @@ system_description = {
     'preprocessing' : [ # Happens in parallel
         {
             'class' : mturk_scoring_adapters.MturkScoringPreprocessingAdapter,
-            'args' : [ VoidPreprocessor.VoidPreprocessor ]
+            'args' : [ hred_preprocessing.HredPreprocessor ]
         }
     ],
     'postprocessing' : {
@@ -41,7 +41,13 @@ system_description = {
     },
     'agent' : {
         'class' : mturk_scoring_adapters.MturkScoringAgentAdapter,
-        'args' : [ EchoAgent.EchoAgent ]
+        'args' : [ hred_agent.HREDAgent ],
+        'kwargs' : {
+            'ignore_unknown_words' : True,
+            'normalize' : False,
+            'dictionary_path' : '/home/ml/rlowe1/UbuntuData/Dataset.dict.pkl',
+            'model_prefix' : '/home/2016/pparth2/Desktop/gods/Goal-Oriented_Dialogue_Systems/Pre-Trained_HRED_Model/drive-download-20161021T162213Z/1453999317.44_UbuntuModel_HRED/1453999317.44_UbuntuModel_HRED'
+        }
     },
     'domain_knowledge' : {
         'class' : EmptyDomainKnowledge.EmptyDomainKnowledge

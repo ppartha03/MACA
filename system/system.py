@@ -37,10 +37,10 @@ class System(PubSub.Publisher):
         postprocessing.set_domain_knowledge(domain_knowledge)
 
         output_system = System(input_device, output_device, preprocessing, postprocessing, listeners, agent, domain_knowledge)
-        listeners.subscribe(input_device, (system_channels.INPUT, ))
+        listeners.subscribe(input_device, (system_channels.INPUT, system_channels.SCORING))
         listeners.subscribe(output_system, (system_channels.INPUT, system_channels.OUTPUT))
 
-        output_system.accept_subscription(agent, channels = (system_channels.TRAINING, system_channels.SCORING,))
+        output_system.accept_subscription(agent, channels = (system_channels.TRAINING,))
         input_device.accept_subscription(agent, channels = (system_channels.TRAINING,))
         return output_system
 

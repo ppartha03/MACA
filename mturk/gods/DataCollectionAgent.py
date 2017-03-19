@@ -1,6 +1,6 @@
 from agents.AbstractAgent import AbstractAgent
 from system import system_channels
-from TextData import TextData
+from MturkData import MturkData
 
 import logging
 logger = logging.getLogger(__name__)
@@ -24,15 +24,12 @@ class MturkCollectionAgent(AbstractAgent):
         """
         pass
 
-    def accept_response(self, response_id, response_data):
+    def accept_response(self, conversation_id, response_id, response_data):
         """
             Accept a response from front end client. Immediately enqueue this response at the output queue.
         """
 
-        self.queue_output(TextData({
-            "id" : response_id,
-            "data": response_data
-        }))
+        self.queue_output(MturkData(conversation_id, response_id, response_data))
 
     def process_notification(self, content, channel):
         logger.info("Agent received notification {0} on channel {1}.".format(content, channel))

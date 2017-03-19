@@ -23,8 +23,12 @@ class NotifiedResponseOutputDevice(OutputDevice.FileOutputDevice):
             return None
 
     def write_output(self, output):
-        response_id = output['id']
-        response_content = output['data']
+        """
+            We expect an object of type MturkData here.
+        """
+        conversation_id = output.conversation_id
+        response_id = output.context_id
+        response_content = output.data
 
         if response_id in self.events:
             self.responses[response_id] = response_content

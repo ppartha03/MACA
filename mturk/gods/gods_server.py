@@ -15,27 +15,34 @@ PORT_NUMBER = 22222
 
 class ResponseCollectionServer(BaseHTTPServer.BaseHTTPRequestHandler):
 
-    def _process_response(self, response_payload):
+    def _process_response(self, conversation_id, response_payload):
         context_id = response_payload['id']
         user_response = response_payload['data']
-        self.server.gods_system.agent.accept_response(context_id, user_response)
+        self.server.gods_system.agent.accept_response(conversation_id, context_id, user_response)
 
-    def _get_next_context(self):
-        return self.server.gods_system.input_device.request_context()
+    def _get_next_context(self, conversation_id):
+        return self.server.gods_system.input_device.request_context(conversation_id)
 
     def _process_request(self, json_payload):
+        if 'conversation_id' not in json_payload:
+            return None
+        conversation_id = json_payload['conversation_id']
+
         response = json_payload['response']
         if response: # If there exists a response
-            self._process_response(response)
+            self._process_response(conversation_id, response)
 
         result = {}
         if 'context' in json_payload: # Request for a new context
-            next_context = self._get_next_context()
+            next_context = self._get_next_context(conversation_id)
             result = {
-                'context' : next_context
+                'context' : {
+                    'id' : next_context.context_id,
+                    'data' : next_context.data
+                }
             }
 
-
+        print "Returning {}".format(result)
         return result
 
     def do_HEAD(self):
@@ -83,6 +90,9 @@ class ScoringServer(BaseHTTPServer.BaseHTTPRequestHandler):
     def _process_request(self, json_payload):
         print "Request: {}".format(json_payload)
 
+        if 'conversation_id' not in json_payload:
+            return None
+        conversation_id = json_payload['conversation_id']
         returned_object = {}
 
         if 'context' in json_payload and json_payload['context']:
@@ -90,21 +100,21 @@ class ScoringServer(BaseHTTPServer.BaseHTTPRequestHandler):
             new_context = data['data']
 
             event = threading.Event(0)
-            new_id = self.server.gods_system.input_device.accept_context(new_context)
+            new_id = self.server.gods_system.input_device.accept_context(conversation_id, new_context)
             self.server.gods_system.output_device.register_response_event(new_id, event)
-            event.wait(3)
+            event.wait(10)
             response = self.server.gods_system.output_device.get_response(new_id)
 
             returned_object['response'] = {
                 'id' : new_id,
-                'data' : response
+                'data' : response.data if hasattr(response, 'data') else response
             }
 
         if 'scoring' in json_payload and json_payload['scoring']:
             data = json_payload['scoring']
             response_id = data['id']
             response_score = data['score']
-            self.server.gods_system.input_device.accept_score(response_id, response_score)
+            self.server.gods_system.input_device.accept_score(conversation_id, response_id, response_score)
 
             returned_object['scoring'] = { 'status' : 'success' }
 

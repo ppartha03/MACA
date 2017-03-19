@@ -2,6 +2,7 @@ from mturk.gods import ContextFetchingInputDevice
 from devices import OutputDevice
 
 from mturk.gods import DataCollectionAgent
+from mturk.gods import DatabaseListener
 
 from preprocessing import VoidPreprocessor
 from postprocessing import VoidPostprocessor
@@ -42,11 +43,15 @@ system_description = {
     },
     'listeners' : {
         'named' : {
-            'scoring' : { 'class' : Scoring.SampleScoring }
+            # 'scoring' : { 'class' : Scoring.SampleScoring }
         },
         'unnamed': [
             {
-                'class' : LoggingListener.LoggingListener
+                'class' : LoggingListener.LoggingListener,
+            },
+            {
+                'class' : DatabaseListener.DatabaseResponseListener,
+                'args' : [ 'mturk/collected_data' ]
             }
         ]
     }

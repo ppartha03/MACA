@@ -168,20 +168,11 @@ var StroopExperiment = function() {
     var current_context = "";
     var context_count = 0;
 
-    // Stimuli for a basic Stroop experiment
-    var stims = [
-            ["SHIP", "red", "unrelated"],
-            ["MONKEY", "green", "unrelated"],
-            ["ZAMBONI", "blue", "unrelated"],
-            ["RED", "red", "congruent"],
-            ["GREEN", "green", "congruent"],
-            ["BLUE", "blue", "congruent"],
-            ["GREEN", "red", "incongruent"],
-            ["BLUE", "green", "incongruent"],
-            ["RED", "blue", "incongruent"]
-        ];
+    var user_id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+            return v.toString(16);
+        });
 
-    stims = _.shuffle(stims);
 
     var finish = function() {
         $("#trial").unbind("keydown", response_handler); // Unbind keys
@@ -208,7 +199,7 @@ var StroopExperiment = function() {
     };
 
     var get_response = function(context, include_scoring) {
-        var data = { "context" : null };
+        var data = { "conversation_id" : user_id, "context" : null };
 
         if (context) { // Then submit this response together with the get context request.
             console.log("Submitting context " + context);

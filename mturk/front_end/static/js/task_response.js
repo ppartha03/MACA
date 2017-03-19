@@ -167,20 +167,10 @@ var StroopExperiment = function() {
     var current_context_id = 0;
     var context_count = 0;
 
-    // Stimuli for a basic Stroop experiment
-    var stims = [
-            ["SHIP", "red", "unrelated"],
-            ["MONKEY", "green", "unrelated"],
-            ["ZAMBONI", "blue", "unrelated"],
-            ["RED", "red", "congruent"],
-            ["GREEN", "green", "congruent"],
-            ["BLUE", "blue", "congruent"],
-            ["GREEN", "red", "incongruent"],
-            ["BLUE", "green", "incongruent"],
-            ["RED", "blue", "incongruent"]
-        ];
-
-    stims = _.shuffle(stims);
+    var user_id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+        return v.toString(16);
+    });
 
     var finish = function() {
         $("#trial").unbind("keydown", response_handler); // Unbind keys
@@ -206,7 +196,7 @@ var StroopExperiment = function() {
     };
 
     var get_next_context = function(response) {
-        var data = { "response" : null };
+        var data = { "conversation_id" : user_id, "response" : null };
         if (context_count < MAX_CONTEXT_COUNT) {
             data.context = "";
         }
@@ -228,16 +218,18 @@ var StroopExperiment = function() {
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4 && xhr.status == 200) {
                 var json = JSON.parse(xhr.responseText);
-
+                console.log(json);
                 if (json.hasOwnProperty('context')) {
                     current_context_id = json.context.id;
                     new_context_data = json.context.data;
+                    console.log("BBBBBBBBBBBB");
                 }
             }
         }
         xhr.send(JSON.stringify(data));
 
         context_count++;
+        console.log(new_context_data);
         return new_context_data;
     };
 
