@@ -5,8 +5,8 @@ class NameAskingPolicy(model.IntentPolicy):
     """
         Simple tokenizer to parse the name that the user provides.
     """
-    def __init__(self, slots):
-        super(NameAskingPolicy, self).__init__(slots)
+    def __init__(self, policy_name):
+        super(NameAskingPolicy, self).__init__(policy_name)
 
     def get_info(self, sentence):
         tokens = sentence.strip().split(', ')
@@ -34,8 +34,8 @@ class AddressAskingPolicy(model.IntentPolicy):
     """
         Simple tokenizer to parse the address that the user provides.
     """
-    def __init__(self, slots):
-        super(AddressAskingPolicy, self).__init__(slots)
+    def __init__(self, policy_name):
+        super(AddressAskingPolicy, self).__init__(policy_name)
 
     def get_info(self, sentence):
         tokens = sentence.strip().split(', ')
@@ -69,6 +69,10 @@ class PersonalInformationAskingModel(model.GoalOrientedModel):
     """
     def __init__(self, intents = [], domain_knowledge = None, mode = system_modes.EXECUTION):
         super(PersonalInformationAskingModel, self).__init__(intents, domain_knowledge, mode)
+        for intent in intents:
+            slots = domain_knowledge.get_slots(intent.get_policy_name())
+            assert slots is not None
+            intent.set_slots(slots)
 
     def get_intent(self, sentence):
         if 'address' in sentence:

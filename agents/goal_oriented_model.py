@@ -50,12 +50,18 @@ class Slot(object):
 
 class IntentPolicy(object):
     """
-        Policy to handle an intention of the user
+        Policy to handle an intention of the user.
     """
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, slots):
+    def __init__(self, policy_name):
         super(IntentPolicy, self).__init__()
+        self.policy_name = policy_name
+
+    def get_policy_name(self):
+        return self.policy_name
+
+    def set_slots(self, slots):
         self.slots = {}
         for slot in slots:
             self.slots[slot.name] = slot
