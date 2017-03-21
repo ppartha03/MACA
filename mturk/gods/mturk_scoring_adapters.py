@@ -17,10 +17,7 @@ class MturkScoringPreprocessingAdapter(AbstractPreprocessor.AbstractPreprocessor
         content = data.data
 
         response = self.preprocessing.preprocess(TextData(content))
-        data.data = response
-        # Alternatively we may opt to create new object.
-        # return MturkData.create_object_from(data, response)
-        return data
+        return MturkData.create_object_from(data, response)
 
 class MturkScoringPostProcessing(AbstractPostprocessor.AbstractPostprocessor):
     def __init__(self, postprocessing_class, *args, **kwargs):
@@ -33,10 +30,7 @@ class MturkScoringPostProcessing(AbstractPostprocessor.AbstractPostprocessor):
         content = data.data
 
         response = self.postprocessing.postprocess(content)
-        data.data = response
-        # Alternatively we may opt to create new object.
-        # return MturkData.create_object_from(data, response)
-        return data
+        return MturkData.create_object_from(data, response)
 
 class MturkScoringAgentAdapter(AbstractAgent.AbstractAgent):
     def __init__(self, agent_class, *args, **kwargs):
@@ -62,8 +56,8 @@ class MturkScoringAgentAdapter(AbstractAgent.AbstractAgent):
         while not self.agent.output_data.empty():
             output = self.agent.next_output(timeout = 0)
             assert output is not None
-            reference_objects[index].data = output
-            outputs.append(reference_objects[index])
+            replaced_output = MturkData.create_object_from(reference_objects[index], output)
+            outputs.append(replaced_output)
             index += 1
 
         assert index == len(reference_objects)

@@ -10,7 +10,7 @@ class MturkData(TextData):
         self.context_id = context_id
 
     def copy_metadata_from(self, other):
-        super(MturkData, self).copy_metadata(other)
+        super(MturkData, self).copy_metadata_from(other)
         self.conversation_id = other.conversation_id
         self.context_id = other.context_id
 

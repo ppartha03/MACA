@@ -36,4 +36,4 @@ class NotifiedResponseOutputDevice(OutputDevice.FileOutputDevice):
             event = self.events.pop(response_id)
             event.set()
 
-        super(NotifiedResponseOutputDevice, self).write_output(TextData(response_content))
+        super(NotifiedResponseOutputDevice, self).write_output(response_content)
