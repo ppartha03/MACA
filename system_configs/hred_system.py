@@ -39,8 +39,21 @@ system_description = {
         'kwargs' : {
             'ignore_unknown_words' : True,
             'normalize' : False,
-            'dictionary_path' : '/home/ml/rlowe1/UbuntuData/Dataset.dict.pkl',
-            'model_prefix' : '/home/2016/pparth2/Desktop/gods/Goal-Oriented_Dialogue_Systems/Pre-Trained_HRED_Model/drive-download-20161021T162213Z/1453999317.44_UbuntuModel_HRED/1453999317.44_UbuntuModel_HRED'
+
+            # 'prototype' : 'prototype_ubuntu_HRED',
+            # 'train_dialogues' : "/home/ml/rlowe1/UbuntuData/Training.dialogues.pkl",
+            # 'test_dialogues' : "/home/ml/rlowe1/UbuntuData/Test.dialogues.pkl",
+            # 'valid_dialogues' : "/home/ml/rlowe1/UbuntuData/Validation.dialogues.pkl",
+            # 'dictionary_path' : '/home/ml/rlowe1/UbuntuData/Dataset.dict.pkl',
+            'prototype' : 'prototype_twitter_HRED',
+            'train_dialogues' : '/home/ml/rlowe1/TwitterData/Training.dialogues.pkl',
+            'test_dialogues' : '/home/ml/rlowe1/TwitterData/Test.dialogues.pkl',
+            'valid_dialogues' : '/home/ml/rlowe1/TwitterData/Validation.dialogues.pkl',
+            'dictionary_path' : '/home/ml/rlowe1/TwitterData/Dataset.dict.pkl',
+
+            # 'model_prefix' : '/home/2016/pparth2/Desktop/gods/Goal-Oriented_Dialogue_Systems/Pre-Trained_HRED_Model/drive-download-20161021T162213Z/1453999317.44_UbuntuModel_HRED/1453999317.44_UbuntuModel_HRED'
+            # 'model_prefix' : '/home/ml/rlowe1/TwitterData/hred_twitter_models/1470516214.08_TwitterModel__405001'
+            'model_prefix' : '/home/2016/pparth2/Desktop/gods/Goal-Oriented_Dialogue_Systems/Pre-Trained_Twitter_Model/1450650334.74_TwitterModel'
         }
     },
     'domain_knowledge' : {

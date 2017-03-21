@@ -25,7 +25,7 @@ from sample_systems.hred import train
 from sample_systems.hred import search
 from sample_systems.hred.dialog_encdec import DialogEncoderDecoder
 from sample_systems.hred.numpy_compat import argpartition
-from sample_systems.hred.state import prototype_ubuntu_HRED #prototype_state
+from sample_systems.hred import state as config_state
 
 from sample_systems.hred import chat
 
@@ -58,19 +58,27 @@ class HREDAgent(AbstractAgent):
     def __init__(self, train_args = {},
                     ignore_unknown_words = True,
                     normalize = False,
+                    prototype = 'prototype_ubuntu_HRED',
+                    train_dialogues = "/home/ml/rlowe1/UbuntuData/Training.dialogues.pkl",
+                    test_dialogues = "/home/ml/rlowe1/UbuntuData/Test.dialogues.pkl",
+                    valid_dialogues = "/home/ml/rlowe1/UbuntuData/Validation.dialogues.pkl",
                     dictionary_path = '/home/ml/rlowe1/UbuntuData/Dataset.dict.pkl',
                     model_prefix = '/home/2016/pparth2/Desktop/gods/Goal-Oriented_Dialogue_Systems/Pre-Trained_HRED_Model/drive-download-20161021T162213Z/1453999317.44_UbuntuModel_HRED/1453999317.44_UbuntuModel_HRED',
                     mode = system_modes.EXECUTION, domain_knowledge = None):
         super(HREDAgent, self).__init__(domain_knowledge, mode)
 
         if mode == system_modes.EXECUTION:
-            state = prototype_ubuntu_HRED() #prototype_state()
+            assert hasattr(config_state, prototype)
+            state = getattr(config_state, prototype)()
 
             state_path = model_prefix + "_state.pkl"
             model_path = model_prefix + "_model.npz"
 
             with open(state_path) as src:
                 state.update(cPickle.load(src))
+            state['train_dialogues'] = train_dialogues
+            state['test_dialogues'] = test_dialogues
+            state['valid_dialogues'] = valid_dialogues
             state['dictionary'] = dictionary_path
 
             self.ignore_unknown_words = ignore_unknown_words
