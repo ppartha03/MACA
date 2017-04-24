@@ -18,16 +18,20 @@ system_description = {
         'class' : OutputDevice.FileOutputDevice,
         'args' : ['out.gods']
     },
-    'preprocessing' : [ # Happens in parallel
-        {
-            'class' : VoidPreprocessor.VoidPreprocessor,
-        },
-        {
-            'class' : VoidPreprocessor.VoidPreprocessor,
-        }
-    ],
+    'preprocessing' : {
+        'modules' : [ # Happens in parallel
+            {
+                'class' : VoidPreprocessor.VoidPreprocessor,
+            },
+            {
+                'class' : VoidPreprocessor.VoidPreprocessor,
+            }
+        ],
+        'parallel' : False
+    },
     'postprocessing' : {
         'output_index' : 0, # Index of the postprocessing unit whose output will be piped to output
+        'parallel' : False,
         'modules' : [ # Happens in parallel
             {
                 'class' : VoidPostprocessor.VoidPostprocessor,
