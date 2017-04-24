@@ -9,7 +9,7 @@ class POSTaggerPreprocessor(AbstractPreprocessor.AbstractPreprocessor):
     """
 
     def __init__(self):
-        super(StopWordRemovalPreprocessor, self).__init__()
+        super(POSTaggerPreprocessor, self).__init__()
 
     def preprocess(self, data):
         sentence = data.data
