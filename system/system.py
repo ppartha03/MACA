@@ -5,6 +5,7 @@ from utils import object_utils
 object_creator = object_utils.create_object
 
 import system_channels
+import configuration_converter
 from PreprocessingUnit import PreprocessingUnit
 from PostprocessingUnit import PostprocessingUnit
 from ListenerUnit import ListenerUnit
@@ -14,6 +15,8 @@ class System(PubSub.Publisher):
 
     @classmethod
     def construct_system(klass, system_description):
+        system_description = configuration_converter.convert_to_latest_config(system_description)
+
         input_device = object_creator(system_description['input'])
         output_device =  object_creator(system_description['output'])
 
