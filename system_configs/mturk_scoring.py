@@ -24,15 +24,17 @@ system_description = {
         'class' : NotifiedResponseOutputDevice.NotifiedResponseOutputDevice,
         'args' : ['out.gods']
     },
-    'preprocessing' : [ # Happens in parallel
-        {
-            'class' : mturk_scoring_adapters.MturkScoringPreprocessingAdapter,
-            'args' : [ VoidPreprocessor.VoidPreprocessor ]
-        }
-    ],
+    'preprocessing' : {
+        'modules': [
+            {
+                'class' : mturk_scoring_adapters.MturkScoringPreprocessingAdapter,
+                'args' : [ VoidPreprocessor.VoidPreprocessor ]
+            }
+        ]
+    },
     'postprocessing' : {
         'output_index' : 0, # Index of the postprocessing unit whose output will be piped to output
-        'modules' : [ # Happens in parallel
+        'modules' : [
             {
                 'class' : mturk_scoring_adapters.MturkScoringPostProcessing,
                 'args' : [ VoidPostprocessor.VoidPostprocessor ]

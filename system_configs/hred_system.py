@@ -18,14 +18,16 @@ system_description = {
         'class' : OutputDevice.FileOutputDevice,
         'args' : ['out.gods']
     },
-    'preprocessing' : [ # Happens in parallel
-        {
-            'class' : hred_preprocessing.HredPreprocessor,
-        }
-    ],
+    'preprocessing' : {
+        'modules': [
+            {
+                'class' : hred_preprocessing.HredPreprocessor,
+            }
+        ]
+    },
     'postprocessing' : {
         'output_index' : 0, # Index of the postprocessing unit whose output will be piped to output
-        'modules' : [ # Happens in parallel
+        'modules' : [
             {
                 'class' : VoidPostprocessor.VoidPostprocessor,
             },

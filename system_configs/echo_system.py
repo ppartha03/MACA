@@ -19,7 +19,7 @@ system_description = {
         'args' : ['out.gods']
     },
     'preprocessing' : {
-        'modules' : [ # Happens in parallel
+        'modules' : [
             {
                 'class' : VoidPreprocessor.VoidPreprocessor,
             },
@@ -32,7 +32,7 @@ system_description = {
     'postprocessing' : {
         'output_index' : 0, # Index of the postprocessing unit whose output will be piped to output
         'parallel' : False,
-        'modules' : [ # Happens in parallel
+        'modules' : [
             {
                 'class' : VoidPostprocessor.VoidPostprocessor,
             },

@@ -20,12 +20,14 @@ system_description = {
         'class' : OutputDevice.FileOutputDevice,
         'args' : ['out.gods']
     },
-    'preprocessing' : [ # Happens in parallel
-        {
-            'class' : RetrievalModelPreprocessor.RetrievalModelPreprocessor,
-            'args' : ['sample_systems/retrieval_model/BPE/Twitter_Codes_5000.txt']
-        }
-    ],
+    'preprocessing' : {
+        'modules': [ # Happens in parallel
+            {
+                'class' : RetrievalModelPreprocessor.RetrievalModelPreprocessor,
+                'args' : ['sample_systems/retrieval_model/BPE/Twitter_Codes_5000.txt']
+            }
+        ]
+    },
     'postprocessing' : {
         'output_index' : 0, # Index of the postprocessing unit whose output will be piped to output
         'modules' : [ # Happens in parallel
