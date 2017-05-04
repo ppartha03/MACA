@@ -1,5 +1,6 @@
 # MACA
 Modular Architecture for Conversational Agents
+[arxiv paper](https://arxiv.org/abs/1705.00673)
 
 ## Architecture
 [Diagram](https://drive.google.com/open?id=0B3VG4mDUTWdINnQ1T1Bac3RQbW8)
